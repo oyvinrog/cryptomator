@@ -66,7 +66,7 @@ public class RecoveryKeyRecoverController implements FxController {
 
 	@FXML
 	public void initialize() {
-		if (Objects.requireNonNull(recoverType.get()) == RecoveryActionType.RESET_PASSWORD) {
+		if (recoverType.get() == RecoveryActionType.RESET_PASSWORD) {
 			cancelButton.setText(resourceBundle.getString("generic.button.cancel"));
 		} else {
 			cancelButton.setText(resourceBundle.getString("generic.button.back"));
@@ -75,7 +75,7 @@ public class RecoveryKeyRecoverController implements FxController {
 
 	@FXML
 	public void close() {
-		if (Objects.requireNonNull(recoverType.get()) == RecoveryActionType.RESET_PASSWORD) {
+		if (recoverType.get() == RecoveryActionType.RESET_PASSWORD) {
 			window.close();
 		} else {
 			window.setScene(onBoardingScene.get());
