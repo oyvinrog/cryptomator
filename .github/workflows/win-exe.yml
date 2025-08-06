@@ -12,6 +12,11 @@ on:
         description: 'Build debug version with console output'
         type: boolean
         default: false
+      sign:
+        description: 'Sign binaries'
+        required: false
+        type: boolean
+        default: false
   push:
     branches-ignore:
       - 'dependabot/**'
@@ -126,9 +131,6 @@ jobs:
           --no-man-pages
           --strip-debug
           --compress zip-0
-      - name: Change win-console flag if debug is active
-        if: ${{ inputs.isDebug }}
-        run: echo "WIN_CONSOLE_FLAG=--win-console" >> $GITHUB_ENV
       - name: Run jpackage
         run: >
           ${JAVA_HOME}/bin/jpackage
@@ -166,7 +168,7 @@ jobs:
           --java-options "-Djavafx.verbose=${{ inputs.isDebug }}"
           --resource-dir dist/win/resources
           --icon dist/win/resources/Cryptomator.ico
-          ${WIN_CONSOLE_FLAG}
+          --add-launcher "Cryptomator (Debug)=dist/win/debug-launcher.properties"
       - name: Patch Application Directory
         run: |
           cp dist/win/contrib/* appdir/Cryptomator
@@ -181,7 +183,9 @@ jobs:
             exit 1
           }
       - name: Fix permissions
-        run: attrib -r appdir/Cryptomator/Cryptomator.exe
+        run: |
+          attrib -r appdir/Cryptomator/Cryptomator.exe
+          attrib -r "appdir/Cryptomator/Cryptomator (Debug).exe"
         shell: pwsh
       - name: Extract jars with DLLs for Codesigning
         shell: pwsh
@@ -206,16 +210,17 @@ jobs:
           New-Item -Path appdir/jpackage-jmod -ItemType Directory
           & $env:JAVA_HOME\bin\jmod.exe extract --dir jpackage-jmod "${env:JAVA_HOME}\jmods\jdk.jpackage.jmod"
           Get-ChildItem -Recurse -Path "jpackage-jmod" -File wixhelper.dll | Select-Object -Last 1 | Copy-Item -Destination "appdir"
-      - name: Codesign
-        uses: skymatic/code-sign-action@v3
+      - name: Sign DLLs with Actalis CodeSigner
+        if: inputs.sign || github.event_name == 'release'
+        uses: skymatic/workflows/.github/actions/win-sign-action@450e322ff2214d0be0b079b63343c894f3ef735f
         with:
-          certificate: ${{ secrets.WIN_CODESIGN_P12_BASE64 }}
-          password: ${{ secrets.WIN_CODESIGN_P12_PW }}
-          certificatesha1: 5FC94CE149E5B511E621F53A060AC67CBD446B3A
-          description: Cryptomator
-          timestampUrl: 'http://timestamp.digicert.com'
-          folder: appdir
+          base-dir: 'appdir'
+          file-extensions: 'dll,exe,ps1'
           recursive: true
+          sign-description: 'Cryptomator'
+          sign-url: 'https://cryptomator.org'
+          username: ${{ secrets.WIN_CODESIGN_USERNAME }}
+          password: ${{ secrets.WIN_CODESIGN_PW }}
       - name: Replace DLLs inside jars with signed ones
         shell: pwsh
         run: |
@@ -264,15 +269,16 @@ jobs:
         env:
           JP_WIXWIZARD_RESOURCES: ${{ github.workspace }}/dist/win/resources # requires abs path, used in resources/main.wxs
           JP_WIXHELPER_DIR: ${{ github.workspace }}\appdir
-      - name: Codesign MSI
-        uses: skymatic/code-sign-action@v3
+      - name: Sign msi with Actalis CodeSigner
+        if: inputs.sign || github.event_name == 'release'
+        uses: skymatic/workflows/.github/actions/win-sign-action@450e322ff2214d0be0b079b63343c894f3ef735f
         with:
-          certificate: ${{ secrets.WIN_CODESIGN_P12_BASE64 }}
-          password: ${{ secrets.WIN_CODESIGN_P12_PW }}
-          certificatesha1: 5FC94CE149E5B511E621F53A060AC67CBD446B3A
-          description: Cryptomator Installer
-          timestampUrl: 'http://timestamp.digicert.com'
-          folder: installer
+          base-dir: 'installer'
+          file-extensions: 'msi'
+          sign-description: 'Cryptomator Installer'
+          sign-url: 'https://cryptomator.org'
+          username: ${{ secrets.WIN_CODESIGN_USERNAME }}
+          password: ${{ secrets.WIN_CODESIGN_PW }}
       - name: Add possible alpha/beta tags and architecture to installer name
         run: mv installer/Cryptomator-*.msi Cryptomator-${{ needs.get-version.outputs.semVerStr }}-${{ matrix.arch }}.msi
       - name: Create detached GPG signature with key 615D449FE6E6A235
@@ -375,27 +381,29 @@ jobs:
       - name: Detach burn engine in preparation to sign
         run: >
           wix burn detach installer/unsigned/Cryptomator-Installer.exe -engine tmp/engine.exe
-      - name: Codesign burn engine
-        uses: skymatic/code-sign-action@v3
+      - name: Sign burn engine with Actalis CodeSigner
+        if: inputs.sign || github.event_name == 'release'
+        uses: skymatic/workflows/.github/actions/win-sign-action@450e322ff2214d0be0b079b63343c894f3ef735f
         with:
-          certificate: ${{ secrets.WIN_CODESIGN_P12_BASE64 }}
-          password: ${{ secrets.WIN_CODESIGN_P12_PW }}
-          certificatesha1: 5FC94CE149E5B511E621F53A060AC67CBD446B3A
-          description: Cryptomator Installer
-          timestampUrl: 'http://timestamp.digicert.com'
-          folder: tmp
+          base-dir: 'tmp'
+          file-extensions: 'exe'
+          sign-description: 'Cryptomator Bundle Installer'
+          sign-url: 'https://cryptomator.org'
+          username: ${{ secrets.WIN_CODESIGN_USERNAME }}
+          password: ${{ secrets.WIN_CODESIGN_PW }}
       - name: Reattach signed burn engine to installer
         run: >
           wix burn reattach installer/unsigned/Cryptomator-Installer.exe -engine tmp/engine.exe -o installer/Cryptomator-Installer.exe
-      - name: Codesign EXE
-        uses: skymatic/code-sign-action@v3
+      - name: Sign installer with Actalis CodeSigner
+        if: inputs.sign || github.event_name == 'release'
+        uses: skymatic/workflows/.github/actions/win-sign-action@450e322ff2214d0be0b079b63343c894f3ef735f
         with:
-          certificate: ${{ secrets.WIN_CODESIGN_P12_BASE64 }}
-          password: ${{ secrets.WIN_CODESIGN_P12_PW }}
-          certificatesha1: 5FC94CE149E5B511E621F53A060AC67CBD446B3A
-          description: Cryptomator Installer
-          timestampUrl: 'http://timestamp.digicert.com'
-          folder: installer
+          base-dir: 'installer'
+          file-extensions: 'exe'
+          sign-description: 'Cryptomator Bundle Installer'
+          sign-url: 'https://cryptomator.org'
+          username: ${{ secrets.WIN_CODESIGN_USERNAME }}
+          password: ${{ secrets.WIN_CODESIGN_PW }}
       - name: Add possible alpha/beta tags to installer name
         run: mv installer/Cryptomator-Installer.exe Cryptomator-${{ needs.get-version.outputs.semVerStr }}-${{ matrix.executable-suffix }}.exe
       - name: Create detached GPG signature with key 615D449FE6E6A235
