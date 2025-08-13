@@ -77,8 +77,9 @@ public class ChooseMasterkeyFileController implements FxController {
 
 	@FXML
 	void restoreMasterkey() {
+		Stage ownerStage = (Stage) window.getOwner();
 		window.close();
-		recoveryKeyWindow.create(vault, window, new SimpleObjectProperty<>(RecoveryActionType.RESTORE_MASTERKEY)).showOnboardingDialogWindow();
+		recoveryKeyWindow.create(vault, ownerStage, new SimpleObjectProperty<>(RecoveryActionType.RESTORE_MASTERKEY)).showOnboardingDialogWindow();
 	}
 
 	@FXML

@@ -27,7 +27,7 @@ public class RecoveryKeyExpertSettingsController implements FxController {
 
 	public static final int MAX_SHORTENING_THRESHOLD = 220;
 	public static final int MIN_SHORTENING_THRESHOLD = 36;
-	private static final String DOCS_NAME_SHORTENING_URL = "https://docs.cryptomator.org/security/architecture/#name-shortening";
+	private static final String DOCS_NAME_SHORTENING_URL = "https://docs.cryptomator.org/security/vault/#name-shortening";
 
 	private final Stage window;
 	private final Lazy<Application> application;

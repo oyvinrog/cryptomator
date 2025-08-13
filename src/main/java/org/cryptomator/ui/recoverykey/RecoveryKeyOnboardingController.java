@@ -8,16 +8,19 @@ import org.cryptomator.ui.common.FxmlScene;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.ResourceBundle;
@@ -48,8 +51,10 @@ public class RecoveryKeyOnboardingController implements FxController {
 	private Button nextButton;
 	@FXML
 	private VBox chooseMethodeBox;
-	private final ToggleGroup methodToggleGroup = new ToggleGroup();
-	private final BooleanProperty showThirdText = new SimpleBooleanProperty(true);
+	@FXML
+	private ToggleGroup methodToggleGroup = new ToggleGroup();
+	@FXML
+	private HBox hBox;
 
 	@Inject
 	public RecoveryKeyOnboardingController(@RecoveryKeyWindow Stage window, //
@@ -68,38 +73,57 @@ public class RecoveryKeyOnboardingController implements FxController {
 
 	@FXML
 	public void initialize() {
-
 		recoveryKeyRadio.setToggleGroup(methodToggleGroup);
 		passwordRadio.setToggleGroup(methodToggleGroup);
 
-		boolean showMethodSelection = (recoverType.get() == RecoveryActionType.RESTORE_VAULT_CONFIG);
-		chooseMethodeBox.setVisible(showMethodSelection);
-		chooseMethodeBox.setManaged(showMethodSelection);
+		BooleanBinding showMethodSelection = Bindings.createBooleanBinding(
+				() -> recoverType.get() == RecoveryActionType.RESTORE_VAULT_CONFIG, recoverType);
+		chooseMethodeBox.visibleProperty().bind(showMethodSelection);
+		chooseMethodeBox.managedProperty().bind(showMethodSelection);
 
-		nextButton.disableProperty().bind( //
-				affirmationBox.selectedProperty().not() //
-						.or(methodToggleGroup.selectedToggleProperty().isNull() //
-								.and(showMethodSelectionProperty())));
+		nextButton.disableProperty().bind(
+				affirmationBox.selectedProperty().not()
+						.or(methodToggleGroup.selectedToggleProperty().isNull().and(showMethodSelection))
+		);
 
 		switch (recoverType.get()) {
-			case RESTORE_VAULT_CONFIG -> {
-				window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
-				messageLabel.setText(resourceBundle.getString("recoveryKey.recover.onBoarding.readThis"));
-				secondTextDesc.setText(resourceBundle.getString("recoveryKey.recover.onBoarding.recoverVaultConfig.intro2"));
-				showThirdText.set(false);
-			}
-			case RESTORE_MASTERKEY -> {
-				window.setTitle(resourceBundle.getString("recoveryKey.recoverMasterkey.title"));
-				messageLabel.setText(resourceBundle.getString("recoveryKey.recover.onBoarding.readThis"));
-				titleLabel.setText(resourceBundle.getString("recoveryKey.recoverMasterkey.title"));
-				secondTextDesc.setText(resourceBundle.getString("recoveryKey.recover.onBoarding.recoverMasterkey.intro2"));
-				showThirdText.set(false);
-			}
+			case RESTORE_MASTERKEY ->
+					window.setTitle(resourceBundle.getString("recoveryKey.recoverMasterkey.title"));
+			case RESTORE_ALL, RESTORE_VAULT_CONFIG ->
+					window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
+			default -> window.setTitle("");
 		}
-	}
 
-	private BooleanProperty showMethodSelectionProperty() {
-		return new SimpleBooleanProperty(recoverType.get() == RecoveryActionType.RESTORE_VAULT_CONFIG);
+		messageLabel.textProperty().bind(Bindings.createStringBinding(
+				() -> resourceBundle.getString("recoveryKey.recover.onBoarding.readThis"), recoverType));
+
+		titleLabel.textProperty().bind(Bindings.createStringBinding(() ->
+				recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY
+						? resourceBundle.getString("recoveryKey.recoverMasterkey.title")
+						: resourceBundle.getString("recoveryKey.recoverVaultConfig.title"), recoverType));
+
+		BooleanBinding isMaster = Bindings.createBooleanBinding(
+				() -> recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY, recoverType);
+		hBox.minHeightProperty().bind(Bindings.when(isMaster).then(206.0).otherwise(Region.USE_COMPUTED_SIZE));
+
+		secondTextDesc.textProperty().bind(Bindings.createStringBinding(() -> {
+			RecoveryActionType type = recoverType.get();
+			Toggle sel = methodToggleGroup.getSelectedToggle();
+			return switch (type) {
+				case RESTORE_VAULT_CONFIG -> resourceBundle.getString(sel == passwordRadio
+						? "recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.password"
+						: "recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.recoveryKey");
+				case RESTORE_MASTERKEY -> resourceBundle.getString("recoveryKey.recover.onBoarding.recoverMasterkey.intro2");
+				case RESTORE_ALL       -> resourceBundle.getString("recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.recoveryKey");
+				default                -> "";
+			};
+		}, recoverType, methodToggleGroup.selectedToggleProperty()));
+
+		showMethodSelection.addListener((_, _, nowShown) -> {
+			if (nowShown && methodToggleGroup.getSelectedToggle() == null) {
+				methodToggleGroup.selectToggle(recoveryKeyRadio);
+			}
+		});
 	}
 
 	@FXML
@@ -125,14 +149,6 @@ public class RecoveryKeyOnboardingController implements FxController {
 			case RESTORE_MASTERKEY -> window.setScene(recoverykeyRecoverScene.get());
 		}
 		window.centerOnScreen();
-	}
-
-	public BooleanProperty showThirdTextProperty() {
-		return showThirdText;
-	}
-
-	public boolean getShowThirdText() {
-		return showThirdText.get();
 	}
 
 }
