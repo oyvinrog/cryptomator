@@ -25,8 +25,6 @@ import javax.inject.Named;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -60,9 +58,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 	private final ObjectProperty<RecoveryActionType> recoverType;
 	private final ObjectProperty<CryptorProvider.Scheme> cipherCombo;
 	private final ResourceBundle resourceBundle;
-	private final StringProperty buttonText = new SimpleStringProperty();
 	private final Dialogs dialogs;
-	private final Stage owner;
 
 	public NewPasswordController newPasswordController;
 	public Button nextButton;
@@ -72,7 +68,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 											  @RecoveryKeyWindow Vault vault, //
 											  RecoveryKeyFactory recoveryKeyFactory, //
 											  ExecutorService executor, //
-											  @Named("keyRecoveryOwner") Stage owner, @RecoveryKeyWindow StringProperty recoveryKey, //
+											  @RecoveryKeyWindow StringProperty recoveryKey, //
 											  @FxmlScene(FxmlFile.RECOVERYKEY_EXPERT_SETTINGS) Lazy<Scene> recoverExpertSettingsScene, //
 											  @FxmlScene(FxmlFile.RECOVERYKEY_RECOVER) Lazy<Scene> recoverykeyRecoverScene, //
 											  FxApplicationWindows appWindows, //
@@ -80,8 +76,9 @@ public class RecoveryKeyResetPasswordController implements FxController {
 											  VaultListManager vaultListManager, //
 											  @Named("shorteningThreshold") IntegerProperty shorteningThreshold, //
 											  @Named("recoverType") ObjectProperty<RecoveryActionType> recoverType, //
-											  @Named("cipherCombo") ObjectProperty<CryptorProvider.Scheme> cipherCombo,//
-											  ResourceBundle resourceBundle, Dialogs dialogs) {
+											  @Named("cipherCombo") ObjectProperty<CryptorProvider.Scheme> cipherCombo, //
+											  ResourceBundle resourceBundle, //
+											  Dialogs dialogs) {
 		this.window = window;
 		this.vault = vault;
 		this.recoveryKeyFactory = recoveryKeyFactory;
@@ -97,7 +94,6 @@ public class RecoveryKeyResetPasswordController implements FxController {
 		this.recoverType = recoverType;
 		this.resourceBundle = resourceBundle;
 		this.dialogs = dialogs;
-		this.owner = owner;
 	}
 
 	@FXML
@@ -155,7 +151,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 
 	@FXML
 	public void resetPassword() {
-		Task<Void> task = new ResetPasswordTask(recoveryKeyFactory, vault, recoveryKey, newPasswordController);
+		Task<Void> task = new ResetPasswordTask();
 
 		task.setOnScheduled(_ -> LOG.debug("Using recovery key to reset password for {}.", vault.getDisplayablePath()));
 
@@ -178,14 +174,6 @@ public class RecoveryKeyResetPasswordController implements FxController {
 
 	/* Getter/Setter */
 
-	public StringProperty buttonTextProperty() {
-		return buttonText;
-	}
-
-	public String getButtonText() {
-		return buttonText.get();
-	}
-
 	public ReadOnlyBooleanProperty passwordSufficientAndMatchingProperty() {
 		return newPasswordController.goodPasswordProperty();
 	}
@@ -194,20 +182,11 @@ public class RecoveryKeyResetPasswordController implements FxController {
 		return newPasswordController.isGoodPassword();
 	}
 
-	private static class ResetPasswordTask extends Task<Void> {
+	private class ResetPasswordTask extends Task<Void> {
 
 		private static final Logger LOG = LoggerFactory.getLogger(ResetPasswordTask.class);
-		private final RecoveryKeyFactory recoveryKeyFactory;
-		private final Vault vault;
-		private final StringProperty recoveryKey;
-		private final NewPasswordController newPasswordController;
 
-		public ResetPasswordTask(RecoveryKeyFactory recoveryKeyFactory, Vault vault, StringProperty recoveryKey, NewPasswordController newPasswordController) {
-			this.recoveryKeyFactory = recoveryKeyFactory;
-			this.vault = vault;
-			this.recoveryKey = recoveryKey;
-			this.newPasswordController = newPasswordController;
-
+		public ResetPasswordTask() {
 			setOnFailed(_ -> LOG.error("Failed to reset password", getException()));
 		}
 
