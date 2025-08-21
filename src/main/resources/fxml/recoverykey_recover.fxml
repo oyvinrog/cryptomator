@@ -33,7 +33,7 @@
 		</Group>
 
 		<VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_CENTER">
-			<fx:include fx:id="recoveryKeyValidate" source="recoverykey_validate.fxml"/>
+			<fx:include source="recoverykey_validate.fxml"/>
 
 			<Region VBox.vgrow="ALWAYS"/>
 

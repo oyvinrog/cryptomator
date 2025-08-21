@@ -10,35 +10,33 @@
 	  fx:controller="org.cryptomator.ui.mainwindow.VaultDetailMissingVaultController"
 	  alignment="TOP_CENTER"
 	  spacing="9">
-	<children>
-		<VBox spacing="9" alignment="CENTER">
-			<StackPane alignment="CENTER">
-				<Circle styleClass="glyph-icon-primary" radius="48"/>
-				<FontAwesome5IconView styleClass="glyph-icon-white" glyph="FILE" glyphSize="48"/>
-				<FontAwesome5IconView styleClass="glyph-icon-primary" glyph="SEARCH" glyphSize="24">
-					<StackPane.margin>
-						<Insets top="12"/>
-					</StackPane.margin>
-				</FontAwesome5IconView>
-			</StackPane>
-			<Label text="%main.vaultDetail.missingVaultConfig.info" wrapText="true"/>
-		</VBox>
-		<VBox spacing="6" alignment="CENTER">
-			<Button text="%main.vaultDetail.missing.recheck" minWidth="120" onAction="#recheck">
-				<graphic>
-					<FontAwesome5IconView glyph="REDO"/>
-				</graphic>
-			</Button>
-			<Button text="%main.vaultDetail.missingVaultConfig.restore" minWidth="120" onAction="#restoreVaultConfig">
-				<graphic>
-					<FontAwesome5IconView glyph="MAGIC"/>
-				</graphic>
-			</Button>
-			<Button text="%main.vaultDetail.missing.remove" minWidth="120" onAction="#didClickRemoveVault">
-				<graphic>
-					<FontAwesome5IconView glyph="TRASH"/>
-				</graphic>
-			</Button>
-		</VBox>
-	</children>
+	<VBox spacing="9" alignment="CENTER">
+		<StackPane>
+			<Circle styleClass="glyph-icon-primary" radius="48"/>
+			<FontAwesome5IconView styleClass="glyph-icon-white" glyph="FILE" glyphSize="48"/>
+			<FontAwesome5IconView styleClass="glyph-icon-primary" glyph="SEARCH" glyphSize="24">
+				<StackPane.margin>
+					<Insets top="12"/>
+				</StackPane.margin>
+			</FontAwesome5IconView>
+		</StackPane>
+		<Label text="%main.vaultDetail.missingVaultConfig.info" wrapText="true"/>
+	</VBox>
+	<VBox spacing="6" alignment="CENTER">
+		<Button text="%main.vaultDetail.missing.recheck" minWidth="120" onAction="#recheck">
+			<graphic>
+				<FontAwesome5IconView glyph="REDO"/>
+			</graphic>
+		</Button>
+		<Button text="%main.vaultDetail.missingVaultConfig.restore" minWidth="120" onAction="#restoreVaultConfig">
+			<graphic>
+				<FontAwesome5IconView glyph="MAGIC"/>
+			</graphic>
+		</Button>
+		<Button text="%main.vaultDetail.missing.remove" minWidth="120" onAction="#didClickRemoveVault">
+			<graphic>
+				<FontAwesome5IconView glyph="TRASH"/>
+			</graphic>
+		</Button>
+	</VBox>
 </VBox>

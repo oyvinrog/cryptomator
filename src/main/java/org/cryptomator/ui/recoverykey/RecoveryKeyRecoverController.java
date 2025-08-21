@@ -13,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 @RecoveryKeyScoped
@@ -33,15 +32,15 @@ public class RecoveryKeyRecoverController implements FxController {
 
 	@Inject
 	public RecoveryKeyRecoverController(@RecoveryKeyWindow Stage window, //
+										ResourceBundle resourceBundle, //
 										@FxmlScene(FxmlFile.RECOVERYKEY_RESET_PASSWORD) Lazy<Scene> resetPasswordScene, //
 										@FxmlScene(FxmlFile.RECOVERYKEY_EXPERT_SETTINGS) Lazy<Scene> expertSettingsScene, //
 										@FxmlScene(FxmlFile.RECOVERYKEY_ONBOARDING) Lazy<Scene> onBoardingScene, //
-										ResourceBundle resourceBundle, //
 										@Named("recoverType") ObjectProperty<RecoveryActionType> recoverType) {
 		this.window = window;
-		this.recoverType = recoverType;
-		this.onBoardingScene = onBoardingScene;
 		this.resourceBundle = resourceBundle;
+		this.onBoardingScene = onBoardingScene;
+		this.recoverType = recoverType;
 		this.nextScene = switch (recoverType.get()) {
 			case RESTORE_ALL, RESTORE_VAULT_CONFIG -> {
 				window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
@@ -61,7 +60,6 @@ public class RecoveryKeyRecoverController implements FxController {
 			}
 			default -> throw new IllegalArgumentException("Unexpected recovery action type: " + recoverType.get());
 		};
-
 	}
 
 	@FXML

@@ -153,10 +153,12 @@ public class RecoveryKeyResetPasswordController implements FxController {
 	public void resetPassword() {
 		Task<Void> task = new ResetPasswordTask();
 
-		task.setOnScheduled(_ -> LOG.debug("Using recovery key to reset password for {}.", vault.getDisplayablePath()));
+		task.setOnScheduled(_ -> {
+			LOG.debug("Using recovery key to reset password for {}.", vault.getDisplayablePath());
+		});
 
 		task.setOnSucceeded(_ -> {
-			LOG.info("Used recovery key to reset password for {}.", vault.getDisplayablePath());
+			LOG.debug("Used recovery key to reset password for {}.", vault.getDisplayablePath());
 			window.close();
 			switch (recoverType.get()){
 				case RESET_PASSWORD -> dialogs.prepareRecoverPasswordSuccess(window).build().showAndWait();
@@ -170,16 +172,6 @@ public class RecoveryKeyResetPasswordController implements FxController {
 		});
 
 		executor.submit(task);
-	}
-
-	/* Getter/Setter */
-
-	public ReadOnlyBooleanProperty passwordSufficientAndMatchingProperty() {
-		return newPasswordController.goodPasswordProperty();
-	}
-
-	public boolean isPasswordSufficientAndMatching() {
-		return newPasswordController.isGoodPassword();
 	}
 
 	private class ResetPasswordTask extends Task<Void> {
@@ -196,4 +188,15 @@ public class RecoveryKeyResetPasswordController implements FxController {
 			return null;
 		}
 	}
+
+	/* Getter/Setter */
+
+	public ReadOnlyBooleanProperty passwordSufficientAndMatchingProperty() {
+		return newPasswordController.goodPasswordProperty();
+	}
+
+	public boolean isPasswordSufficientAndMatching() {
+		return newPasswordController.isGoodPassword();
+	}
+
 }

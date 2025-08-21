@@ -80,11 +80,6 @@ public class VaultDetailMissingVaultController implements FxController {
 	}
 
 	@FXML
-	void restoreMasterkey() {
-		recoveryKeyWindow.create(vault.get(), window, new SimpleObjectProperty<>(RecoveryActionType.RESTORE_MASTERKEY)).showRecoveryKeyRecoverWindow();
-	}
-
-	@FXML
 	public void unlock() {
 		vault.get().stateProperty().set(VaultState.Value.LOCKED);
 		appWindows.startUnlockWorkflow(vault.get(), mainWindow);

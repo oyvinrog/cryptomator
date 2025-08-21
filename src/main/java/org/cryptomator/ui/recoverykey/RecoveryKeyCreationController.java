@@ -63,12 +63,10 @@ public class RecoveryKeyCreationController implements FxController {
 	public Button nextButton;
 	private final VaultListManager vaultListManager;
 	private final Dialogs dialogs;
-	private final Stage owner;
 
 	@Inject
 	public RecoveryKeyCreationController(FxApplicationWindows appWindows, //
 										 @RecoveryKeyWindow Stage window, //
-										 @Named("keyRecoveryOwner") Stage owner, //
 										 @FxmlScene(FxmlFile.RECOVERYKEY_SUCCESS) Lazy<Scene> successScene, //
 										 @FxmlScene(FxmlFile.RECOVERYKEY_EXPERT_SETTINGS) Lazy<Scene> recoverykeyExpertSettingsScene, //
 										 @RecoveryKeyWindow Vault vault, //
@@ -94,7 +92,6 @@ public class RecoveryKeyCreationController implements FxController {
 		this.masterkeyFileAccess = masterkeyFileAccess;
 		this.shorteningThreshold = shorteningThreshold;
 		this.vaultListManager = vaultListManager;
-		this.owner = owner;
 		this.dialogs = dialogs;
 	}
 
@@ -174,7 +171,6 @@ public class RecoveryKeyCreationController implements FxController {
 			appWindows.showErrorWindow(e, window, null);
 		}
 	}
-
 
 	@FXML
 	public void close() {

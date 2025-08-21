@@ -20,9 +20,9 @@ import javafx.stage.Stage;
 import java.util.EnumSet;
 import java.util.Objects;
 
+import static org.cryptomator.common.vaults.VaultState.Value.ALL_MISSING;
 import static org.cryptomator.common.vaults.VaultState.Value.ERROR;
 import static org.cryptomator.common.vaults.VaultState.Value.LOCKED;
-import static org.cryptomator.common.vaults.VaultState.Value.ALL_MISSING;
 import static org.cryptomator.common.vaults.VaultState.Value.MISSING;
 import static org.cryptomator.common.vaults.VaultState.Value.NEEDS_MIGRATION;
 import static org.cryptomator.common.vaults.VaultState.Value.UNLOCKED;
