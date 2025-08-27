@@ -2,11 +2,10 @@ package org.cryptomator.ui.mainwindow;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.cryptomator.common.recovery.RecoveryActionType;
+import org.cryptomator.common.recovery.VaultPreparator;
 import org.cryptomator.common.settings.Settings;
-import org.cryptomator.common.settings.VaultSettings;
 import org.cryptomator.common.vaults.Vault;
 import org.cryptomator.common.vaults.VaultComponent;
-import org.cryptomator.common.vaults.VaultConfigCache;
 import org.cryptomator.common.vaults.VaultListManager;
 import org.cryptomator.cryptofs.CryptoFileSystemProvider;
 import org.cryptomator.cryptofs.DirStructure;
@@ -255,7 +254,7 @@ public class VaultListController implements FxController {
 			}
 		} while (selectedDirectory == null);
 
-		Vault preparedVault = prepareVault(selectedDirectory, vaultComponentFactory, mountServices);
+		Vault preparedVault = VaultPreparator.prepareVault(selectedDirectory, vaultComponentFactory, mountServices);
 
 		Optional<Vault> matchingVaultListEntry = vaultListManager.get(preparedVault.getPath());
 		if (matchingVaultListEntry.isPresent()) {
@@ -276,33 +275,6 @@ public class VaultListController implements FxController {
 			}
 		}
 
-	}
-
-	public static Vault prepareVault(File selectedDirectory, VaultComponent.Factory vaultComponentFactory, List<MountService> mountServices) {
-		Path selectedPath = selectedDirectory.toPath();
-		VaultSettings vaultSettings = VaultSettings.withRandomId();
-		vaultSettings.path.set(selectedPath);
-		if (selectedPath.getFileName() != null) {
-			vaultSettings.displayName.set(selectedPath.getFileName().toString());
-		} else {
-			vaultSettings.displayName.set("defaultVaultName");
-		}
-
-		var wrapper = new VaultConfigCache(vaultSettings);
-		Vault vault = vaultComponentFactory.create(vaultSettings, wrapper, LOCKED, null).vault();
-		try {
-			VaultListManager.determineVaultState(vault.getPath());
-		} catch (IOException e) {
-			LOG.warn("Failed to determine vault state for {}", vaultSettings.path.get(), e);
-		}
-
-		//due to https://github.com/cryptomator/cryptomator/issues/2880#issuecomment-1680313498
-		var nameOfWinfspLocalMounter = "org.cryptomator.frontend.fuse.mount.WinFspMountProvider";
-		if (SystemUtils.IS_OS_WINDOWS && vaultSettings.path.get().toString().contains("Dropbox") && mountServices.stream().anyMatch(s -> s.getClass().getName().equals(nameOfWinfspLocalMounter))) {
-			vaultSettings.mountService.setValue(nameOfWinfspLocalMounter);
-		}
-
-		return vault;
 	}
 
 	private void pressedShortcutToRemoveVault() {
