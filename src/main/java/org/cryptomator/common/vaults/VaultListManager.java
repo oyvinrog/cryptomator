@@ -186,32 +186,36 @@ public class VaultListManager {
 	}
 
 	public static VaultState.Value determineVaultState(Path pathToVault) throws IOException {
-		Path pathToVaultConfig = pathToVault.resolve(VAULTCONFIG_FILENAME);
-		Path pathToMasterkey = pathToVault.resolve(MASTERKEY_FILENAME);
-
 		if (!Files.exists(pathToVault)) {
 			return MISSING;
 		}
 
-		if(!Files.exists(pathToVaultConfig)) {
+		VaultState.Value structureResult = checkDirStructure(pathToVault);
+
+		if (structureResult == LOCKED || structureResult == NEEDS_MIGRATION) {
+			return structureResult;
+		}
+
+		Path pathToVaultConfig = pathToVault.resolve(VAULTCONFIG_FILENAME);
+		Path pathToMasterkey = pathToVault.resolve(MASTERKEY_FILENAME);
+
+		if (!Files.exists(pathToVaultConfig)) {
 			BackupRestorer.restoreIfBackupPresent(pathToVault, VAULTCONFIG_FILENAME);
 		}
-		if(!Files.exists(pathToMasterkey)){
+		if (!Files.exists(pathToMasterkey)) {
 			BackupRestorer.restoreIfBackupPresent(pathToVault, MASTERKEY_FILENAME);
 		}
 
-		if (!Files.exists(pathToVaultConfig) && !Files.exists(pathToMasterkey)) {
+		boolean hasConfig = Files.exists(pathToVaultConfig);
+
+		if (!hasConfig && !Files.exists(pathToMasterkey)) {
 			return ALL_MISSING;
 		}
-		var checkedDirStructureVaultState = checkDirStructure(pathToVault);
-		if (!Files.exists(pathToVaultConfig)) {
-			return switch (checkedDirStructureVaultState) {
-				case LOCKED, MISSING -> VAULT_CONFIG_MISSING;
-				default -> checkedDirStructureVaultState;
-			};
+		if (!hasConfig) {
+			return VAULT_CONFIG_MISSING;
 		}
 
-		return checkedDirStructureVaultState;
+		return structureResult;
 	}
 
 	private static VaultState.Value checkDirStructure(Path pathToVault) throws IOException {
