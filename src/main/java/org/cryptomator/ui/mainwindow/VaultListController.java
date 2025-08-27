@@ -226,6 +226,26 @@ public class VaultListController implements FxController {
 		VaultListManager.redetermineVaultState(newValue);
 	}
 
+	private Optional<File> chooseValidVaultDirectory() {
+		DirectoryChooser directoryChooser = new DirectoryChooser();
+		File selectedDirectory;
+
+		do {
+			selectedDirectory = directoryChooser.showDialog(mainWindow);
+			if (selectedDirectory == null) {
+				return Optional.empty();
+			}
+
+			Path selectedPath = selectedDirectory.toPath();
+			if (!Files.isDirectory(selectedPath.resolve(Constants.DATA_DIR_NAME))) {
+				dialogs.prepareNoDDirectorySelectedDialog(mainWindow).build().showAndWait();
+				selectedDirectory = null;
+			}
+		} while (selectedDirectory == null);
+
+		return Optional.of(selectedDirectory);
+	}
+
 	@FXML
 	public void didClickAddNewVault() {
 		addVaultWizard.build().showAddNewVaultWizard(resourceBundle);
@@ -238,23 +258,12 @@ public class VaultListController implements FxController {
 
 	@FXML
 	public void didClickRecoverExistingVault() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
-		File selectedDirectory;
+		Optional<File> selectedDirectory = chooseValidVaultDirectory();
+		if (selectedDirectory.isEmpty()) {
+			return;
+		}
 
-		do {
-			selectedDirectory = directoryChooser.showDialog(mainWindow);
-			if (selectedDirectory == null) {
-				return;
-			}
-
-			Path selectedPath = selectedDirectory.toPath();
-			if (!Files.isDirectory(selectedPath.resolve(Constants.DATA_DIR_NAME))) {
-				dialogs.prepareNoDDirectorySelectedDialog(mainWindow).build().showAndWait();
-				selectedDirectory = null;
-			}
-		} while (selectedDirectory == null);
-
-		Vault preparedVault = VaultPreparator.prepareVault(selectedDirectory, vaultComponentFactory, mountServices);
+		Vault preparedVault = VaultPreparator.prepareVault(selectedDirectory.get(), vaultComponentFactory, mountServices);
 
 		Optional<Vault> matchingVaultListEntry = vaultListManager.get(preparedVault.getPath());
 		if (matchingVaultListEntry.isPresent()) {
