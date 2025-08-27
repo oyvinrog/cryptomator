@@ -80,12 +80,6 @@ public class VaultDetailMissingVaultController implements FxController {
 	}
 
 	@FXML
-	public void unlock() {
-		vault.get().stateProperty().set(VaultState.Value.LOCKED);
-		appWindows.startUnlockWorkflow(vault.get(), mainWindow);
-	}
-
-	@FXML
 	void changeLocation() {
 		// copied from ChooseExistingVaultController class
 		FileChooser fileChooser = new FileChooser();
