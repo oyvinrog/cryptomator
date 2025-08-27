@@ -130,19 +130,7 @@ public class VaultListManager {
 		var wrapper = new VaultConfigCache(vaultSettings);
 		try {
 			var vaultState = determineVaultState(vaultSettings.path.get());
-			if (vaultState == LOCKED) { //for legacy reasons: pre v8 vault do not have a config, but they are in the NEEDS_MIGRATION state
-				wrapper.reloadConfig();
-				if (Objects.isNull(vaultSettings.lastKnownKeyLoader.get())) {
-					var keyIdScheme = wrapper.get().getKeyId().getScheme();
-					vaultSettings.lastKnownKeyLoader.set(keyIdScheme);
-				}
-			} else if (vaultState == NEEDS_MIGRATION) {
-				vaultSettings.lastKnownKeyLoader.set(MasterkeyFileLoadingStrategy.SCHEME);
-			}
-
-			if (vaultState != VAULT_CONFIG_MISSING) {
-				initializeLastKnownKeyLoaderIfPossible(vaultSettings, wrapper);
-			}
+			initializeLastKnownKeyLoaderIfPossible(vaultSettings, vaultState, wrapper);
 
 			return vaultComponentFactory.create(vaultSettings, wrapper, vaultState, null).vault();
 		} catch (IOException e) {
@@ -151,10 +139,24 @@ public class VaultListManager {
 		}
 	}
 
-	private void initializeLastKnownKeyLoaderIfPossible(VaultSettings vaultSettings, VaultConfigCache wrapper) throws IOException {
-		if (vaultSettings.lastKnownKeyLoader.get() == null) {
-			var keyIdScheme = wrapper.get().getKeyId().getScheme();
-			vaultSettings.lastKnownKeyLoader.set(keyIdScheme);
+	private void initializeLastKnownKeyLoaderIfPossible(VaultSettings vaultSettings, VaultState.Value vaultState, VaultConfigCache wrapper) throws IOException {
+		if (vaultSettings.lastKnownKeyLoader.get() != null) {
+			return;
+		}
+
+		switch (vaultState) {
+			case LOCKED -> { //for legacy reasons: pre v8 vault do not have a config, but they are in the NEEDS_MIGRATION state
+				wrapper.reloadConfig();
+				vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
+			}
+			case NEEDS_MIGRATION -> {
+				vaultSettings.lastKnownKeyLoader.set(MasterkeyFileLoadingStrategy.SCHEME);
+			}
+			default -> {
+				if (vaultState != VaultState.Value.VAULT_CONFIG_MISSING) {
+					vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
+				}
+			}
 		}
 	}
 
