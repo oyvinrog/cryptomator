@@ -28,6 +28,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class RecoveryKeyValidateController implements FxController {
 
@@ -150,6 +151,9 @@ public class RecoveryKeyValidateController implements FxController {
 					recoveryKeyState.set(RecoveryKeyState.INVALID);
 				} catch (IOException e) {
 					LOG.warn("IO error while validating recovery key", e);
+					recoveryKeyState.set(RecoveryKeyState.INVALID);
+				} catch (NoSuchElementException e) {
+					LOG.warn("Missing expected element during recovery key validation.", e);
 					recoveryKeyState.set(RecoveryKeyState.INVALID);
 				}
 			}
