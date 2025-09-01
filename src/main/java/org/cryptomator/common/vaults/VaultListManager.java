@@ -145,17 +145,19 @@ public class VaultListManager {
 		}
 
 		switch (vaultState) {
-			case LOCKED -> { //for legacy reasons: pre v8 vault do not have a config, but they are in the NEEDS_MIGRATION state
+			case LOCKED -> {
 				wrapper.reloadConfig();
 				vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
 			}
 			case NEEDS_MIGRATION -> {
+				//for legacy reasons: pre v8 vault do not have a config, but they are in the NEEDS_MIGRATION state
 				vaultSettings.lastKnownKeyLoader.set(MasterkeyFileLoadingStrategy.SCHEME);
 			}
+			case VAULT_CONFIG_MISSING ->  {
+				//Nothing to do here, since there is no config to read
+			}
 			default -> {
-				if (vaultState != VaultState.Value.VAULT_CONFIG_MISSING) {
-					vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
-				}
+				vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
 			}
 		}
 	}
