@@ -226,7 +226,7 @@ public class VaultListController implements FxController {
 		VaultListManager.redetermineVaultState(newValue);
 	}
 
-	private Optional<File> chooseValidVaultDirectory() {
+	private Optional<Path> chooseValidVaultDirectory() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		File selectedDirectory;
 
@@ -243,7 +243,7 @@ public class VaultListController implements FxController {
 			}
 		} while (selectedDirectory == null);
 
-		return Optional.of(selectedDirectory);
+		return Optional.of(selectedDirectory.toPath());
 	}
 
 	@FXML
@@ -258,14 +258,13 @@ public class VaultListController implements FxController {
 
 	@FXML
 	public void didClickRecoverExistingVault() {
-		Optional<File> selectedDirectory = chooseValidVaultDirectory();
+		Optional<Path> selectedDirectory = chooseValidVaultDirectory();
 		if (selectedDirectory.isEmpty()) {
 			return;
 		}
 
-		Vault preparedVault = VaultPreparator.prepareVault(selectedDirectory.get(), vaultComponentFactory, mountServices);
-
-		Optional<Vault> matchingVaultListEntry = vaultListManager.get(preparedVault.getPath());
+		Path path = selectedDirectory.get();
+		Optional<Vault> matchingVaultListEntry = vaultListManager.get(path);
 		if (matchingVaultListEntry.isPresent()) {
 			dialogs.prepareRecoveryVaultAlreadyExists(mainWindow, matchingVaultListEntry.get().getDisplayName()) //
 					.setOkAction(Stage::close) //
@@ -273,6 +272,7 @@ public class VaultListController implements FxController {
 			return;
 		}
 
+		Vault preparedVault = VaultPreparator.prepareVault(path, vaultComponentFactory, mountServices);
 		VaultListManager.redetermineVaultState(preparedVault);
 
 		switch (preparedVault.getState()) {

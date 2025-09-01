@@ -23,12 +23,11 @@ public final class VaultPreparator {
 
 	private VaultPreparator() {}
 
-	public static Vault prepareVault(File selectedDirectory, VaultComponent.Factory vaultComponentFactory, List<MountService> mountServices) {
-		Path selectedPath = selectedDirectory.toPath();
+	public static Vault prepareVault(Path selectedDirectory, VaultComponent.Factory vaultComponentFactory, List<MountService> mountServices) {
 		VaultSettings vaultSettings = VaultSettings.withRandomId();
-		vaultSettings.path.set(selectedPath);
-		if (selectedPath.getFileName() != null) {
-			vaultSettings.displayName.set(selectedPath.getFileName().toString());
+		vaultSettings.path.set(selectedDirectory);
+		if (selectedDirectory.getFileName() != null) {
+			vaultSettings.displayName.set(selectedDirectory.getFileName().toString());
 		} else {
 			vaultSettings.displayName.set("defaultVaultName");
 		}
