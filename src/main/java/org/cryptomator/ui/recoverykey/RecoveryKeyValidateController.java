@@ -153,7 +153,7 @@ public class RecoveryKeyValidateController implements FxController {
 					LOG.warn("IO error while validating recovery key", e);
 					recoveryKeyState.set(RecoveryKeyState.INVALID);
 				} catch (NoSuchElementException e) {
-					LOG.warn("Missing expected element during recovery key validation.", e);
+					LOG.warn("Could not determine scheme from masterkey during recovery key validation, because no valid *.c9r file is present in vault", e);
 					recoveryKeyState.set(RecoveryKeyState.INVALID);
 				}
 			}
