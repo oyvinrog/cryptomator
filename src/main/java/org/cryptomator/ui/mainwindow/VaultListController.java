@@ -272,7 +272,7 @@ public class VaultListController implements FxController {
 			return;
 		}
 
-		Vault preparedVault = VaultPreparator.prepareVault(path, vaultComponentFactory, mountServices);
+		Vault preparedVault = VaultPreparator.prepareVault(path, vaultComponentFactory, mountServices, resourceBundle);
 		VaultListManager.redetermineVaultState(preparedVault);
 
 		switch (preparedVault.getState()) {

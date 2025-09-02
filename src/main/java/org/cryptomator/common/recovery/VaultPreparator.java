@@ -10,10 +10,10 @@ import org.cryptomator.integrations.mount.MountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static org.cryptomator.common.vaults.VaultState.Value.LOCKED;
 
@@ -23,13 +23,16 @@ public final class VaultPreparator {
 
 	private VaultPreparator() {}
 
-	public static Vault prepareVault(Path selectedDirectory, VaultComponent.Factory vaultComponentFactory, List<MountService> mountServices) {
+	public static Vault prepareVault(Path selectedDirectory, //
+									 VaultComponent.Factory vaultComponentFactory, //
+									 List<MountService> mountServices, //
+									 ResourceBundle resourceBundle) {
 		VaultSettings vaultSettings = VaultSettings.withRandomId();
 		vaultSettings.path.set(selectedDirectory);
 		if (selectedDirectory.getFileName() != null) {
 			vaultSettings.displayName.set(selectedDirectory.getFileName().toString());
 		} else {
-			vaultSettings.displayName.set("defaultVaultName");
+			vaultSettings.displayName.set(resourceBundle.getString("defaults.vault.vaultName"));
 		}
 
 		var wrapper = new VaultConfigCache(vaultSettings);
