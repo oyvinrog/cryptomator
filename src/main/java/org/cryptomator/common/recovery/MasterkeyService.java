@@ -19,6 +19,7 @@ import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -42,7 +43,7 @@ public final class MasterkeyService {
 
 	public static CryptorProvider.Scheme validateRecoveryKeyAndDetectCombo(RecoveryKeyFactory recoveryKeyFactory, //
 																		   Vault vault, String recoveryKey, //
-																		   MasterkeyFileAccess masterkeyFileAccess) throws IOException, CryptoException {
+																		   MasterkeyFileAccess masterkeyFileAccess) throws IOException, CryptoException, NoSuchElementException {
 		String tmpPass = UUID.randomUUID().toString();
 		try (RecoveryDirectory recoveryDirectory = RecoveryDirectory.create(vault.getPath())) {
 			Path tempRecoveryPath = recoveryDirectory.getRecoveryPath();
