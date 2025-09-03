@@ -2,6 +2,8 @@ package org.cryptomator.ui.recoverykey;
 
 import dagger.Lazy;
 import org.cryptomator.common.recovery.RecoveryActionType;
+import org.cryptomator.common.vaults.Vault;
+import org.cryptomator.common.vaults.VaultState;
 import org.cryptomator.ui.common.FxController;
 import org.cryptomator.ui.common.FxmlFile;
 import org.cryptomator.ui.common.FxmlScene;
@@ -32,6 +34,7 @@ import static org.cryptomator.common.recovery.RecoveryActionType.RESTORE_VAULT_C
 public class RecoveryKeyOnboardingController implements FxController {
 
 	private final Stage window;
+	private final Vault vault;
 	private final Lazy<Scene> recoverykeyRecoverScene;
 	private final Lazy<Scene> recoverykeyExpertSettingsScene;
 	private final ObjectProperty<RecoveryActionType> recoverType;
@@ -58,11 +61,13 @@ public class RecoveryKeyOnboardingController implements FxController {
 
 	@Inject
 	public RecoveryKeyOnboardingController(@RecoveryKeyWindow Stage window, //
+										   @RecoveryKeyWindow Vault vault, //
 										   @FxmlScene(FxmlFile.RECOVERYKEY_RECOVER) Lazy<Scene> recoverykeyRecoverScene, //
 										   @FxmlScene(FxmlFile.RECOVERYKEY_EXPERT_SETTINGS) Lazy<Scene> recoverykeyExpertSettingsScene, //
 										   @Named("recoverType") ObjectProperty<RecoveryActionType> recoverType, //
 										   ResourceBundle resourceBundle) {
 		this.window = window;
+		this.vault = vault;
 		window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
 
 		this.recoverykeyRecoverScene = recoverykeyRecoverScene;
@@ -94,8 +99,10 @@ public class RecoveryKeyOnboardingController implements FxController {
 			default -> window.setTitle("");
 		}
 
-		messageLabel.textProperty().bind(Bindings.createStringBinding(
-				() -> resourceBundle.getString("recoveryKey.recover.onBoarding.readThis"), recoverType));
+		messageLabel.textProperty().bind(Bindings.createStringBinding(() ->
+				vault.getState() == VaultState.Value.ALL_MISSING
+				? resourceBundle.getString("recoveryKey.recover.onBoarding.message")
+				: resourceBundle.getString("recoveryKey.recover.onBoarding.readThis")));
 
 		titleLabel.textProperty().bind(Bindings.createStringBinding(() ->
 				recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY
