@@ -2,6 +2,8 @@ package org.cryptomator.ui.recoverykey;
 
 import dagger.Lazy;
 import org.cryptomator.common.recovery.RecoveryActionType;
+import org.cryptomator.common.vaults.Vault;
+import org.cryptomator.common.vaults.VaultState;
 import org.cryptomator.ui.common.FxController;
 import org.cryptomator.ui.common.FxmlFile;
 import org.cryptomator.ui.common.FxmlScene;
@@ -19,6 +21,7 @@ import java.util.ResourceBundle;
 public class RecoveryKeyRecoverController implements FxController {
 
 	private final Stage window;
+	private final Vault vault;
 	private final Lazy<Scene> nextScene;
 	private final Lazy<Scene> onBoardingScene;
 	private final ResourceBundle resourceBundle;
@@ -32,12 +35,14 @@ public class RecoveryKeyRecoverController implements FxController {
 
 	@Inject
 	public RecoveryKeyRecoverController(@RecoveryKeyWindow Stage window, //
+										@RecoveryKeyWindow Vault vault, //
 										ResourceBundle resourceBundle, //
 										@FxmlScene(FxmlFile.RECOVERYKEY_RESET_PASSWORD) Lazy<Scene> resetPasswordScene, //
 										@FxmlScene(FxmlFile.RECOVERYKEY_EXPERT_SETTINGS) Lazy<Scene> expertSettingsScene, //
 										@FxmlScene(FxmlFile.RECOVERYKEY_ONBOARDING) Lazy<Scene> onBoardingScene, //
 										@Named("recoverType") ObjectProperty<RecoveryActionType> recoverType) {
 		this.window = window;
+		this.vault = vault;
 		this.resourceBundle = resourceBundle;
 		this.onBoardingScene = onBoardingScene;
 		this.recoverType = recoverType;
@@ -72,12 +77,23 @@ public class RecoveryKeyRecoverController implements FxController {
 	}
 
 	@FXML
-	public void close() {
-		if (recoverType.get() == RecoveryActionType.RESET_PASSWORD) {
-			window.close();
-		} else {
-			window.setScene(onBoardingScene.get());
-			window.centerOnScreen();
+	public void closeOrReturn() {
+		switch (recoverType.get()) {
+			case RESET_PASSWORD -> window.close();
+			case RESTORE_MASTERKEY -> {
+				window.setScene(onBoardingScene.get());
+				window.centerOnScreen();
+			}
+			default -> {
+				if(vault.getState().equals(VaultState.Value.ALL_MISSING)){
+					recoverType.set(RecoveryActionType.RESTORE_ALL);
+				}
+				else {
+					recoverType.set(RecoveryActionType.RESTORE_VAULT_CONFIG);
+				}
+				window.setScene(onBoardingScene.get());
+				window.centerOnScreen();
+			}
 		}
 	}
 
