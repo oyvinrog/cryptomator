@@ -3,10 +3,8 @@ package org.cryptomator.ui.mainwindow;
 import org.cryptomator.common.recovery.RecoveryActionType;
 import org.cryptomator.common.vaults.Vault;
 import org.cryptomator.common.vaults.VaultListManager;
-import org.cryptomator.common.vaults.VaultState;
 import org.cryptomator.ui.common.FxController;
 import org.cryptomator.ui.dialogs.Dialogs;
-import org.cryptomator.ui.fxapp.FxApplicationWindows;
 import org.cryptomator.ui.keyloading.KeyLoadingStrategy;
 import org.cryptomator.ui.recoverykey.RecoveryKeyComponent;
 
@@ -27,8 +25,6 @@ import static org.cryptomator.common.Constants.MASTERKEY_FILENAME;
 @MainWindowScoped
 public class VaultDetailMissingVaultController implements FxController {
 
-	private final FxApplicationWindows appWindows;
-	private final Stage mainWindow;
 	private final ObjectProperty<Vault> vault;
 	private final ObservableList<Vault> vaults;
 	private final ResourceBundle resourceBundle;
@@ -37,17 +33,12 @@ public class VaultDetailMissingVaultController implements FxController {
 	private final Dialogs dialogs;
 
 	@Inject
-	public VaultDetailMissingVaultController(FxApplicationWindows appWindows, //
-											 @MainWindow Stage mainWindow, //
-											 ObjectProperty<Vault> vault, //
+	public VaultDetailMissingVaultController(ObjectProperty<Vault> vault, //
 											 ObservableList<Vault> vaults, //
 											 ResourceBundle resourceBundle, //
 											 @MainWindow Stage window, //
 											 Dialogs dialogs, //
 											 RecoveryKeyComponent.Factory recoveryKeyWindow) {
-
-		this.appWindows = appWindows;
-		this.mainWindow = mainWindow;
 		this.vault = vault;
 		this.vaults = vaults;
 		this.resourceBundle = resourceBundle;
