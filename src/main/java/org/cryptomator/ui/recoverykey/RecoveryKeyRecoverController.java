@@ -48,11 +48,11 @@ public class RecoveryKeyRecoverController implements FxController {
 		this.recoverType = recoverType;
 		this.nextScene = switch (recoverType.get()) {
 			case RESTORE_ALL, RESTORE_VAULT_CONFIG -> {
-				window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
+				window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
 				yield expertSettingsScene;
 			}
 			case RESTORE_MASTERKEY -> {
-				window.setTitle(resourceBundle.getString("recoveryKey.recoverMasterkey.title"));
+				window.setTitle(resourceBundle.getString("recover.recoverMasterkey.title"));
 				yield resetPasswordScene;
 			}
 			case RESET_PASSWORD -> {

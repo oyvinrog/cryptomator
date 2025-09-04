@@ -100,7 +100,7 @@ public class RecoveryKeyCreationController implements FxController {
 		if (recoverType.get() == RecoveryActionType.SHOW_KEY) {
 			window.setTitle(resourceBundle.getString("recoveryKey.display.title"));
 		} else if (recoverType.get() == RecoveryActionType.RESTORE_VAULT_CONFIG) {
-			window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
+			window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
 			descriptionLabel.formatProperty().set(resourceBundle.getString("recoveryKey.recover.description"));
 			cancelButton.setOnAction((_) -> back());
 			cancelButton.setText(resourceBundle.getString("generic.button.back"));
@@ -158,7 +158,7 @@ public class RecoveryKeyCreationController implements FxController {
 			}
 			window.close();
 			dialogs.prepareRecoverPasswordSuccess(window) //
-					.setTitleKey("recoveryKey.recoverVaultConfig.title") //
+					.setTitleKey("recover.recoverVaultConfig.title") //
 					.setMessageKey("recoveryKey.recover.resetVaultConfigSuccess.message") //
 					.setDescriptionKey("recoveryKey.recover.resetMasterkeyFileSuccess.description")
 					.build().showAndWait();

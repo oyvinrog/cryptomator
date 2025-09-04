@@ -139,7 +139,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 			}
 			window.close();
 			dialogs.prepareRecoverPasswordSuccess(window) //
-					.setTitleKey("recoveryKey.recoverVaultConfig.title") //
+					.setTitleKey("recover.recoverVaultConfig.title") //
 					.setMessageKey("recoveryKey.recover.resetVaultConfigSuccess.message") //
 					.build().showAndWait();
 
@@ -162,7 +162,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 			window.close();
 			switch (recoverType.get()){
 				case RESET_PASSWORD -> dialogs.prepareRecoverPasswordSuccess(window).build().showAndWait();
-				case RESTORE_MASTERKEY -> dialogs.prepareRecoverPasswordSuccess(window).setTitleKey("recoveryKey.recoverMasterkey.title").setMessageKey("recoveryKey.recover.resetMasterkeyFileSuccess.message").build().showAndWait();
+				case RESTORE_MASTERKEY -> dialogs.prepareRecoverPasswordSuccess(window).setTitleKey("recover.recoverMasterkey.title").setMessageKey("recoveryKey.recover.resetMasterkeyFileSuccess.message").build().showAndWait();
 			}
 		});
 

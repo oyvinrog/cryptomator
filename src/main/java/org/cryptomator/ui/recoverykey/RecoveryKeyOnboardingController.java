@@ -68,7 +68,7 @@ public class RecoveryKeyOnboardingController implements FxController {
 										   ResourceBundle resourceBundle) {
 		this.window = window;
 		this.vault = vault;
-		window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
+		window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
 
 		this.recoverykeyRecoverScene = recoverykeyRecoverScene;
 		this.recoverykeyExpertSettingsScene = recoverykeyExpertSettingsScene;
@@ -93,21 +93,21 @@ public class RecoveryKeyOnboardingController implements FxController {
 
 		switch (recoverType.get()) {
 			case RESTORE_MASTERKEY ->
-					window.setTitle(resourceBundle.getString("recoveryKey.recoverMasterkey.title"));
+					window.setTitle(resourceBundle.getString("recover.recoverMasterkey.title"));
 			case RESTORE_ALL, RESTORE_VAULT_CONFIG ->
-					window.setTitle(resourceBundle.getString("recoveryKey.recoverVaultConfig.title"));
+					window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
 			default -> window.setTitle("");
 		}
 
 		messageLabel.textProperty().bind(Bindings.createStringBinding(() ->
 				vault.getState() == VaultState.Value.ALL_MISSING
-				? resourceBundle.getString("recoveryKey.recover.onBoarding.message")
-				: resourceBundle.getString("recoveryKey.recover.onBoarding.readThis")));
+				? resourceBundle.getString("recover.onBoarding.allMissing.intro")
+				: resourceBundle.getString("recover.onBoarding.intro")));
 
 		titleLabel.textProperty().bind(Bindings.createStringBinding(() ->
 				recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY
-						? resourceBundle.getString("recoveryKey.recoverMasterkey.title")
-						: resourceBundle.getString("recoveryKey.recoverVaultConfig.title"), recoverType));
+						? resourceBundle.getString("recover.recoverMasterkey.title")
+						: resourceBundle.getString("recover.recoverVaultConfig.title"), recoverType));
 
 		BooleanBinding isMaster = Bindings.createBooleanBinding(
 				() -> recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY, recoverType);
@@ -118,10 +118,10 @@ public class RecoveryKeyOnboardingController implements FxController {
 			Toggle sel = methodToggleGroup.getSelectedToggle();
 			return switch (type) {
 				case RESTORE_VAULT_CONFIG -> resourceBundle.getString(sel == passwordRadio
-						? "recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.password"
-						: "recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.recoveryKey");
-				case RESTORE_MASTERKEY -> resourceBundle.getString("recoveryKey.recover.onBoarding.recoverMasterkey.intro2");
-				case RESTORE_ALL       -> resourceBundle.getString("recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.recoveryKey");
+						? "recover.onBoarding.intro.password"
+						: "recover.onBoarding.intro.recoveryKey");
+				case RESTORE_MASTERKEY -> resourceBundle.getString("recover.onBoarding.intro.masterkey.recoveryKey");
+				case RESTORE_ALL       -> resourceBundle.getString("recover.onBoarding.intro.recoveryKey");
 				default                -> "";
 			};
 		}, recoverType, methodToggleGroup.selectedToggleProperty()));

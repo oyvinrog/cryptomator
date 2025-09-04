@@ -39,19 +39,19 @@
 		</StackPane>
 	</Group>
 	<VBox HBox.hgrow="ALWAYS" spacing="12">
-		<Label fx:id="titleLabel" text="%recoveryKey.recoverVaultConfig.title" styleClass="label-extra-large"/>
+		<Label fx:id="titleLabel" text="%recover.recoverVaultConfig.title" styleClass="label-extra-large"/>
 		<VBox spacing="6">
 			<VBox fx:id="chooseMethodeBox" spacing="6">
-				<Label text="%recoveryKey.recover.onBoarding.chooseMethod"/>
-				<RadioButton fx:id="recoveryKeyRadio" text="%recoveryKey.recover.onBoarding.useRecoveryKey" selected="true">
+				<Label text="%recover.onBoarding.chooseMethod"/>
+				<RadioButton fx:id="recoveryKeyRadio" text="%recover.onBoarding.useRecoveryKey" selected="true">
 					<toggleGroup>
 						<ToggleGroup fx:id="methodToggleGroup"/>
 					</toggleGroup>
 				</RadioButton>
-				<RadioButton fx:id="passwordRadio" text="%recoveryKey.recover.onBoarding.usePassword"/>
+				<RadioButton fx:id="passwordRadio" text="%recover.onBoarding.usePassword"/>
 			</VBox>
 
-			<Label fx:id="messageLabel" text="%recoveryKey.recover.onBoarding.message" wrapText="true"/>
+			<Label fx:id="messageLabel" wrapText="true"/>
 			<GridPane alignment="CENTER_LEFT">
 				<padding>
 					<Insets left="6"/>
@@ -66,11 +66,11 @@
 					<RowConstraints valignment="TOP"/>
 				</rowConstraints>
 				<Label text="1." GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-				<Label text="%recoveryKey.recover.onBoarding.intro1" wrapText="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+				<Label text="%recover.onBoarding.intro.ensure" wrapText="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 				<Label text="2." GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-				<Label fx:id="secondTextDesc" text="%recoveryKey.recover.onBoarding.recoverVaultConfig.intro2.recoveryKey" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+				<Label fx:id="secondTextDesc" text="%recover.onBoarding.intro.recoveryKey" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 			</GridPane>
-			<CheckBox fx:id="affirmationBox" text="%recoveryKey.recover.onBoarding.affirmation"/>
+			<CheckBox fx:id="affirmationBox" text="%recover.onBoarding.affirmation"/>
 		</VBox>
 
 		<Region VBox.vgrow="ALWAYS"/>

@@ -49,28 +49,28 @@ public class Dialogs {
 				});
 	}
 
-	public SimpleDialog.Builder prepareContactHubAdmin(Stage window) {
+	public SimpleDialog.Builder prepareContactHubVaultOwner(Stage window) {
 		return createDialogBuilder().setOwner(window) //
-				.setTitleKey("contactHubAdmin.title") //
-				.setMessageKey("contactHubAdmin.message") //
-				.setDescriptionKey("contactHubAdmin.description") //
+				.setTitleKey("contactHubVaultOwner.title") //
+				.setMessageKey("contactHubVaultOwner.message") //
+				.setDescriptionKey("contactHubVaultOwner.description") //
 				.setIcon(FontAwesome5Icon.EXCLAMATION)//
 				.setOkButtonKey(BUTTON_KEY_CLOSE);
 	}
 
 	public SimpleDialog.Builder prepareRecoveryVaultAdded(Stage window, String displayName) {
 		return createDialogBuilder().setOwner(window) //
-				.setTitleKey("recoveryKey.recoverExisting.title") //
-				.setMessageKey("recoveryKey.recoverExisting.message") //
-				.setDescriptionKey("recoveryKey.recoverExisting.description", displayName) //
+				.setTitleKey("recover.existing.title") //
+				.setMessageKey("recover.existing.message") //
+				.setDescriptionKey("recover.existing.description", displayName) //
 				.setIcon(FontAwesome5Icon.CHECK)//
 				.setOkButtonKey(BUTTON_KEY_CLOSE);
 	}
 	public SimpleDialog.Builder prepareRecoveryVaultAlreadyExists(Stage window, String displayName) {
 		return createDialogBuilder().setOwner(window) //
-				.setTitleKey("recoveryKey.alreadyExists.title") //
-				.setMessageKey("recoveryKey.alreadyExists.message") //
-				.setDescriptionKey("recoveryKey.alreadyExists.description", displayName) //
+				.setTitleKey("recover.alreadyExists.title") //
+				.setMessageKey("recover.alreadyExists.message") //
+				.setDescriptionKey("recover.alreadyExists.description", displayName) //
 				.setIcon(FontAwesome5Icon.EXCLAMATION)//
 				.setOkButtonKey(BUTTON_KEY_CLOSE);
 	}
@@ -130,9 +130,9 @@ public class Dialogs {
 	public SimpleDialog.Builder prepareNoDDirectorySelectedDialog(Stage window) {
 		return createDialogBuilder() //
 				.setOwner(window) //
-				.setTitleKey("recoveryKey.noDDirDetected.title") //
-				.setMessageKey("recoveryKey.noDDirDetected.message") //
-				.setDescriptionKey("recoveryKey.noDDirDetected.description") //
+				.setTitleKey("recover.invalidSelection.title") //
+				.setMessageKey("recover.invalidSelection.message") //
+				.setDescriptionKey("recover.invalidSelection.description") //
 				.setIcon(FontAwesome5Icon.EXCLAMATION) //
 				.setOkButtonKey("generic.button.change") //
 				.setOkAction(Stage::close);

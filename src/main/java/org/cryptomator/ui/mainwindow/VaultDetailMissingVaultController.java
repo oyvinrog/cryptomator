@@ -69,7 +69,7 @@ public class VaultDetailMissingVaultController implements FxController {
 	@FXML
 	void restoreVaultConfig() {
 		if(KeyLoadingStrategy.isHubVault(vault.get().getVaultSettings().lastKnownKeyLoader.get())){
-			dialogs.prepareContactHubAdmin(window).build().showAndWait();
+			dialogs.prepareContactHubVaultOwner(window).build().showAndWait();
 		}
 		else if(Files.exists(vault.get().getPath().resolve(MASTERKEY_FILENAME))){
 			recoveryKeyWindow.create(vault.get(), window, new SimpleObjectProperty<>(RecoveryActionType.RESTORE_VAULT_CONFIG)).showOnboardingDialogWindow();
