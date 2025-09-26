@@ -199,7 +199,7 @@ jobs:
     name: Create PR for aur-bin repo
     needs: [build, get-version]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && needs.get-version.outputs.versionType == 'stable'
     steps:
       - name: Download AppImages
         uses: actions/download-artifact@v5
