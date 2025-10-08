@@ -41,13 +41,15 @@ jobs:
     name: Build Debian Package
     runs-on: ubuntu-22.04
     needs: [get-version]
+    env:
+      INPUT_PPAVER: ${inputs.ppaver}
     steps:
       - uses: actions/checkout@v5
       - id: deb-version
         name: Determine deb-version
         run: |
-          if [ -n "${{inputs.ppaver}}" ]; then
-            echo "debVersion=${{inputs.ppaver }}" >> "$GITHUB_OUTPUT"
+          if [ -n "${INPUT_PPAVER}" ]; then
+            echo "debVersion=${INPUT_PPAVER}" >> "$GITHUB_OUTPUT"
           else
             echo "debVersion=${{needs.get-version.outputs.semVerStr}}" >> "$GITHUB_OUTPUT"
           fi

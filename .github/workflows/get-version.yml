@@ -49,8 +49,8 @@ jobs:
         run: |
           if [[ $GITHUB_REF =~ refs/tags/[0-9]+\.[0-9]+\.[0-9]+.* ]]; then
             SEM_VER_STR=${GITHUB_REF##*/}
-          elif [[ "${{ inputs.version }}" =~ [0-9]+\.[0-9]+\.[0-9]+.* ]]; then
-            SEM_VER_STR="${{ inputs.version }}"
+          elif [[ "${VERSION_STRING}" =~ [0-9]+\.[0-9]+\.[0-9]+.* ]]; then
+            SEM_VER_STR="${VERSION_STRING}"
           else
             SEM_VER_STR=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout`
           fi
@@ -70,6 +70,8 @@ jobs:
           echo "semVerNum=${SEM_VER_NUM}" >> $GITHUB_OUTPUT
           echo "revNum=${REVCOUNT}" >> $GITHUB_OUTPUT
           echo "type=${TYPE}" >> $GITHUB_OUTPUT
+        env:
+          VERSION_STRING: ${{ inputs.version }}
       - name: Validate Version
         uses: skymatic/semver-validation-action@v3
         with:

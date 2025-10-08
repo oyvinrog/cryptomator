@@ -26,13 +26,10 @@ jobs:
       - name: Determine tarball url
         id: url
         run: |
-          URL="";
-          if [[ -n "${{ inputs.tag }}"  ]]; then
-            URL="https://github.com/cryptomator/cryptomator/archive/refs/tags/${{ inputs.tag }}.tar.gz"
-          else
-            URL="https://github.com/cryptomator/cryptomator/archive/refs/tags/${{ github.event.release.tag_name }}.tar.gz"
-          fi
+          URL="https://github.com/cryptomator/cryptomator/archive/refs/tags/${TAG}.tar.gz"
           echo "url=${URL}" >> "$GITHUB_OUTPUT"
+        env:
+          TAG: ${{ inputs.tag || github.event.release.tag_name}}
       - name: Download source tarball and compute checksum
         id: sha512
         run: |
