@@ -68,8 +68,6 @@ public class RecoveryKeyOnboardingController implements FxController {
 										   ResourceBundle resourceBundle) {
 		this.window = window;
 		this.vault = vault;
-		window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
-
 		this.recoverykeyRecoverScene = recoverykeyRecoverScene;
 		this.recoverykeyExpertSettingsScene = recoverykeyExpertSettingsScene;
 		this.recoverType = recoverType;
