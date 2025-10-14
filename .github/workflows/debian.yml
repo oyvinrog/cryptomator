@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [get-version]
     env:
-      INPUT_PPAVER: ${inputs.ppaver}
+      INPUT_PPAVER: ${{ inputs.ppaver }}
     steps:
       - uses: actions/checkout@v5
       - id: deb-version
