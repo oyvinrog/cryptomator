@@ -227,7 +227,7 @@ public class VaultListManager {
 			return VAULT_CONFIG_MISSING;
 		}
 
-		return structureResult;
+		return checkDirStructure(pathToVault);
 	}
 
 	private static VaultState.Value checkDirStructure(Path pathToVault) throws IOException {
