@@ -97,10 +97,11 @@ public class RecoveryKeyOnboardingController implements FxController {
 			default -> window.setTitle("");
 		}
 
-		messageLabel.textProperty().bind(Bindings.createStringBinding(() ->
-				vault.getState() == VaultState.Value.ALL_MISSING
-				? resourceBundle.getString("recover.onBoarding.allMissing.intro")
-				: resourceBundle.getString("recover.onBoarding.intro")));
+		if (vault.getState() == VaultState.Value.ALL_MISSING) {
+			messageLabel.setText(resourceBundle.getString("recover.onBoarding.allMissing.intro"));
+		} else {
+			messageLabel.setText(resourceBundle.getString("recover.onBoarding.intro"));
+		}
 
 		titleLabel.textProperty().bind(Bindings.createStringBinding(() ->
 				recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY
