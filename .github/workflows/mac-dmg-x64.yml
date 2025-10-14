@@ -44,8 +44,8 @@ jobs:
           architecture: x64
           output-suffix: x64
           fuse-lib: macFUSE
-          openjfx-url: 'https://download2.gluonhq.com/openjfx/24.0.1/openjfx-24.0.1_osx-x64_bin-jmods.zip'
-          openjfx-sha: '6e62a426d43c168a488521f904a523f3dd6ee2cf103e08136f2fd465c828a105'
+          openjfx-url: 'https://download2.gluonhq.com/openjfx/25/openjfx-25_osx-x64_bin-jmods.zip'
+          openjfx-sha: '0eba73fb28a24c845175d16fa2f8c081c936ce6de1be9b79eb6119fa32e53d52'
     steps:
       - uses: actions/checkout@v5
       - name: Setup Java
@@ -79,7 +79,7 @@ jobs:
       - name: Set version
         run : mvn versions:set -DnewVersion=${{ needs.get-version.outputs.semVerStr }}
       - name: Run maven
-        run: mvn -B -Djavafx.platform=mac clean package -Pmac -DskipTests
+        run: mvn -B clean package -Pmac -DskipTests
       - name: Patch target dir
         run: |
           cp LICENSE.txt target
@@ -121,7 +121,6 @@ jobs:
           --app-version "${{ needs.get-version.outputs.semVerNum }}"
           --java-options "--enable-preview"
           --java-options "--enable-native-access=javafx.graphics,org.cryptomator.jfuse.mac"
-          --java-options "--sun-misc-unsafe-memory-access=allow"
           --java-options "-Xss5m"
           --java-options "-Xmx256m"
           --java-options "-Dfile.encoding=\"utf-8\""
@@ -167,7 +166,7 @@ jobs:
           rm -rf ${DERIVED_DATA_PATH}
       - name: Generate license for dmg
         run: >
-          mvn -B -Djavafx.platform=mac license:add-third-party
+          mvn -B license:add-third-party
           -Dlicense.thirdPartyFilename=license.rtf
           -Dlicense.outputDirectory=dist/mac/dmg/resources
           -Dlicense.fileTemplate=dist/mac/dmg/resources/licenseTemplate.ftl

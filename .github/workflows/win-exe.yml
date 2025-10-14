@@ -26,8 +26,8 @@ on:
 
 
 env:
-  OPENJFX_JMODS_AMD64: 'https://download2.gluonhq.com/openjfx/24.0.1/openjfx-24.0.1_windows-x64_bin-jmods.zip'
-  OPENJFX_JMODS_AMD64_HASH: 'f13d17c7caf88654fc835f1b4e75a9b0f34a888eb8abef381796c0002e63b03f'
+  OPENJFX_JMODS_AMD64: 'https://download2.gluonhq.com/openjfx/25/openjfx-25_windows-x64_bin-jmods.zip'
+  OPENJFX_JMODS_AMD64_HASH: 'c8eb9fd039b00e0020cf6c3db8ed7876bf3ee4d27860aa697a247b83b8296ae7'
   WINFSP_MSI: 'https://github.com/winfsp/winfsp/releases/download/v2.1/winfsp-2.1.25156.msi'
   WINFSP_MSI_HASH: '073a70e00f77423e34bed98b86e600def93393ba5822204fac57a29324db9f7a'
   WINFSP_UNINSTALLER: 'https://github.com/cryptomator/winfsp-uninstaller/releases/latest/download/winfsp-uninstaller.exe'
@@ -54,11 +54,6 @@ jobs:
             java-dist: 'zulu'
             java-version: '24.0.1+9'
             java-package: 'jdk'
-          - arch: arm64
-            os: windows-11-arm
-            java-dist: 'liberica'
-            java-version: '24.0.1+11'
-            java-package: 'jdk+fx' #This is needed, as liberica contains JFX 24 Jmods for Windows ARM64
     steps:
       - uses: actions/checkout@v5
       - name: Setup Java
@@ -102,7 +97,7 @@ jobs:
       - name: Set version
         run: mvn versions:set -DnewVersion=${{ needs.get-version.outputs.semVerStr }}
       - name: Run maven
-        run: mvn -B clean package -Pwin -DskipTests -Djavafx.platform=win
+        run: mvn -B clean package -Pwin -DskipTests
       - name: Patch target dir
         run: |
           cp LICENSE.txt target
@@ -144,7 +139,6 @@ jobs:
           --app-version "${{ needs.get-version.outputs.semVerNum }}.${{ needs.get-version.outputs.revNum }}"
           --java-options "--enable-preview"
           --java-options "--enable-native-access=javafx.graphics,org.cryptomator.jfuse.win,org.cryptomator.integrations.win"
-          --java-options "--sun-misc-unsafe-memory-access=allow"
           --java-options "-Xss5m"
           --java-options "-Xmx256m"
           --java-options "-Dcryptomator.appVersion=\"${{ needs.get-version.outputs.semVerStr }}\""
@@ -225,7 +219,7 @@ jobs:
           }
       - name: Generate license for MSI
         run: >
-          mvn -B license:add-third-party "-Djavafx.platform=win"
+          mvn -B license:add-third-party
           "-Dlicense.thirdPartyFilename=license.rtf"
           "-Dlicense.outputDirectory=dist/win/resources"
           "-Dlicense.fileTemplate=dist/win/resources/licenseTemplate.ftl"
@@ -298,12 +292,6 @@ jobs:
             java-dist: 'zulu'
             java-version: '24.0.1+9'
             java-package: 'jdk'
-          - arch: arm64
-            os: windows-11-arm
-            executable-suffix: arm64
-            java-dist: 'liberica'
-            java-version: '24.0.1+11'
-            java-package: 'jdk+fx' #This is needed, as liberica contains JFX 24 Jmods for Windows ARM64
     steps:
       - uses: actions/checkout@v5
       - name: Install wix and extensions
@@ -328,7 +316,7 @@ jobs:
           cache: 'maven'
       - name: Generate license for exe
         run: >
-          mvn -B license:add-third-party "-Djavafx.platform=win"
+          mvn -B license:add-third-party
           "-Dlicense.thirdPartyFilename=license.rtf"
           "-Dlicense.fileTemplate=dist/win/bundle/resources/licenseTemplate.ftl"
           "-Dlicense.outputDirectory=dist/win/bundle/resources"
@@ -417,9 +405,7 @@ jobs:
     needs: [ build-msi, build-exe ]
     outputs:
       download-url-msi-x64: ${{ fromJSON(steps.publish.outputs.assets)[0].browser_download_url }}
-      download-url-msi-arm64: ${{ fromJSON(steps.publish.outputs.assets)[1].browser_download_url }}
       download-url-exe-x64: ${{ fromJSON(steps.publish.outputs.assets)[2].browser_download_url }}
-      download-url-exe-arm64: ${{ fromJSON(steps.publish.outputs.assets)[3].browser_download_url }}
     steps:
       - name: Download installers
         uses: actions/download-artifact@v5
@@ -434,9 +420,7 @@ jobs:
           # do not change ordering of filelist, required for correct job output
           files: |
             *x64.msi
-            *arm64.msi
             *x64.exe
-            *arm64.exe
             *.asc
 
   allowlist-msi-x64:
@@ -446,25 +430,11 @@ jobs:
       url: ${{ needs.publish.outputs.download-url-msi-x64 }}
     secrets: inherit
 
-  allowlist-msi-arm64:
-    uses: ./.github/workflows/av-whitelist.yml
-    needs: [ publish ]
-    with:
-      url: ${{ needs.publish.outputs.download-url-msi-arm64 }}
-    secrets: inherit
-
   allowlist-exe-x64:
     uses: ./.github/workflows/av-whitelist.yml
     needs: [ publish, allowlist-msi-x64 ]
     with:
       url: ${{ needs.publish.outputs.download-url-exe-x64 }}
-    secrets: inherit
-
-  allowlist-exe-arm64:
-    uses: ./.github/workflows/av-whitelist.yml
-    needs: [ publish, allowlist-msi-arm64 ]
-    with:
-      url: ${{ needs.publish.outputs.download-url-exe-arm64 }}
     secrets: inherit
 
   notify-winget:
