@@ -156,8 +156,18 @@ public class VaultListManager {
 			case VAULT_CONFIG_MISSING ->  {
 				//Nothing to do here, since there is no config to read
 			}
+			case MISSING, ALL_MISSING, ERROR, PROCESSING -> {
+				// no config available or not safe to load
+			}
 			default -> {
-				vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
+				if (Files.exists(vaultSettings.path.get().resolve(VAULTCONFIG_FILENAME))) {
+					try {
+						wrapper.reloadConfig();
+						vaultSettings.lastKnownKeyLoader.set(wrapper.get().getKeyId().getScheme());
+					} catch (IOException e) {
+						LOG.debug("Unable to load config for {}", vaultSettings.path.get(), e);
+					}
+				}
 			}
 		}
 	}
