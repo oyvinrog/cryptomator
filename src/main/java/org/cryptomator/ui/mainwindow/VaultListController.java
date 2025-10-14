@@ -282,6 +282,7 @@ public class VaultListController implements FxController {
 				vaultListManager.addVault(preparedVault);
 				dialogs.prepareRecoveryVaultAdded(mainWindow, preparedVault.getDisplayName()).setOkAction(Stage::close).build().showAndWait();
 			}
+			default -> LOG.warn("Unhandled vault state during recovery: {}", preparedVault.getState());
 		}
 
 	}

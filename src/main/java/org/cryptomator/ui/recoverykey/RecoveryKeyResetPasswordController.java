@@ -101,6 +101,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 		switch (recoverType.get()) {
 			case RESTORE_MASTERKEY, RESTORE_ALL -> nextButton.setText(resourceBundle.getString("recoveryKey.recover.recoverBtn"));
 			case RESET_PASSWORD -> nextButton.setText(resourceBundle.getString("recoveryKey.recover.resetBtn"));
+			default -> nextButton.setText(resourceBundle.getString("recoveryKey.recover.recoverBtn")); // Fallback
 		}
 	}
 
@@ -118,6 +119,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 		switch (recoverType.get()) {
 			case RESTORE_ALL -> restorePassword();
 			case RESTORE_MASTERKEY, RESET_PASSWORD -> resetPassword();
+			default -> resetPassword(); // Fallback
 		}
 	}
 
@@ -163,6 +165,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 			switch (recoverType.get()){
 				case RESET_PASSWORD -> dialogs.prepareRecoverPasswordSuccess(window).build().showAndWait();
 				case RESTORE_MASTERKEY -> dialogs.prepareRecoverPasswordSuccess(window).setTitleKey("recover.recoverMasterkey.title").setMessageKey("recoveryKey.recover.resetMasterkeyFileSuccess.message").build().showAndWait();
+				default -> dialogs.prepareRecoverPasswordSuccess(window).build().showAndWait(); // Fallback
 			}
 		});
 
