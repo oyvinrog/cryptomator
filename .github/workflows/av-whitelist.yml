@@ -58,7 +58,7 @@ jobs:
           name: ${{ needs.download-file.outputs.fileName }}
           path: upload
       - name: Upload to Kaspersky
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        uses: SamKirkland/FTP-Deploy-Action@a51268f67f6605236975928ae28b0f7e9971d50a
         with:
           protocol: ftps
           server: allowlist.kaspersky-labs.com
@@ -78,7 +78,7 @@ jobs:
           name: ${{ needs.download-file.outputs.fileName }}
           path: upload
       - name: Upload to Avast
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
+        uses: wlixcc/SFTP-Deploy-Action@a5ccb9c6211a94cc59404f0fdb2a9936a6dfee64
         with:
           server: whitelisting.avast.com
           port: 22

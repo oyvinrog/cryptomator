@@ -71,7 +71,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CRYPTOBOT_PR_TOKEN }}
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661
         if: github.event_name == 'release'
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}

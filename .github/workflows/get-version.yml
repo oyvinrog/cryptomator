@@ -73,6 +73,6 @@ jobs:
         env:
           VERSION_STRING: ${{ inputs.version }}
       - name: Validate Version
-        uses: skymatic/semver-validation-action@v3
+        uses: skymatic/semver-validation-action@7a6ae1c9e121540d11c9c7e4e667c83d583aa153
         with:
           version: ${{ steps.versions.outputs.semVerStr }}

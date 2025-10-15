@@ -70,7 +70,7 @@ jobs:
           }
       - name: Notify
         if: steps.determine.outputs.UPDATE_AVAILABLE == 'true'
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_USERNAME: 'Cryptobot'

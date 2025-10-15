@@ -261,7 +261,7 @@ jobs:
           CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
       - name: Notarize .dmg
         if: startsWith(github.ref, 'refs/tags/') || inputs.notarize
-        uses: cocoalibs/xcode-notarization-action@v1
+        uses: cocoalibs/xcode-notarization-action@5cf433d494b6fa26504b574c591f4dd120388846
         with:
           app-path: 'Cryptomator-*.dmg'
           apple-id: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
@@ -291,7 +291,7 @@ jobs:
           if-no-files-found: error
       - name: Publish dmg on GitHub Releases
         if: startsWith(github.ref, 'refs/tags/') && github.event.action == 'published'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090
         with:
           fail_on_unmatched_files: true
           token: ${{ secrets.CRYPTOBOT_RELEASE_TOKEN }}
