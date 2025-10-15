@@ -48,7 +48,7 @@ jobs:
     env:
       AUR_PR_URL: tbd
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: 'cryptomator/aur'
           token: ${{ secrets.CRYPTOBOT_PR_TOKEN }}
@@ -81,8 +81,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CRYPTOBOT_PR_TOKEN }}
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
         if: github.event_name == 'release'
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_USERNAME: 'Cryptobot'
