@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Get download count of latest releases
         id: get-stats
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             const query = `query($owner:String!, $name:String!) {
