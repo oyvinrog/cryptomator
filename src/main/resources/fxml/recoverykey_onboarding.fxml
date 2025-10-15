@@ -52,6 +52,7 @@
 			</VBox>
 
 			<Label fx:id="messageLabel" wrapText="true"/>
+			<Label fx:id="pleaseConfirm" wrapText="true"/>
 			<GridPane alignment="CENTER_LEFT">
 				<padding>
 					<Insets left="6"/>

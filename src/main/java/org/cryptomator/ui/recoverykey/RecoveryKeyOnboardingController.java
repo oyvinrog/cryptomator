@@ -42,6 +42,7 @@ public class RecoveryKeyOnboardingController implements FxController {
 
 	public Label titleLabel;
 	public Label messageLabel;
+	public Label pleaseConfirm;
 	public Label secondTextDesc;
 
 	@FXML
@@ -90,10 +91,24 @@ public class RecoveryKeyOnboardingController implements FxController {
 		);
 
 		switch (recoverType.get()) {
-			case RESTORE_MASTERKEY ->
-					window.setTitle(resourceBundle.getString("recover.recoverMasterkey.title"));
-			case RESTORE_ALL, RESTORE_VAULT_CONFIG ->
-					window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
+			case RESTORE_MASTERKEY -> {
+				window.setTitle(resourceBundle.getString("recover.recoverMasterkey.title"));
+				messageLabel.setVisible(false);
+				messageLabel.setManaged(false);
+				pleaseConfirm.setText(resourceBundle.getString("recover.onBoarding.pleaseConfirm"));
+			}
+			case RESTORE_ALL -> {
+				window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
+				messageLabel.setVisible(true);
+				messageLabel.setManaged(true);
+				pleaseConfirm.setText(resourceBundle.getString("recover.onBoarding.otherwisePleaseConfirm"));
+			}
+			case RESTORE_VAULT_CONFIG -> {
+				window.setTitle(resourceBundle.getString("recover.recoverVaultConfig.title"));
+				messageLabel.setVisible(false);
+				messageLabel.setManaged(false);
+				pleaseConfirm.setText(resourceBundle.getString("recover.onBoarding.pleaseConfirm"));
+			}
 			default -> window.setTitle("");
 		}
 
@@ -108,9 +123,9 @@ public class RecoveryKeyOnboardingController implements FxController {
 						? resourceBundle.getString("recover.recoverMasterkey.title")
 						: resourceBundle.getString("recover.recoverVaultConfig.title"), recoverType));
 
-		BooleanBinding isMaster = Bindings.createBooleanBinding(
+		BooleanBinding isRestoreMasterkey = Bindings.createBooleanBinding(
 				() -> recoverType.get() == RecoveryActionType.RESTORE_MASTERKEY, recoverType);
-		hBox.minHeightProperty().bind(Bindings.when(isMaster).then(206.0).otherwise(Region.USE_COMPUTED_SIZE));
+		hBox.minHeightProperty().bind(Bindings.when(isRestoreMasterkey).then(206.0).otherwise(Region.USE_COMPUTED_SIZE));
 
 		secondTextDesc.textProperty().bind(Bindings.createStringBinding(() -> {
 			RecoveryActionType type = recoverType.get();
