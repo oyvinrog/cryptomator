@@ -157,7 +157,7 @@ public class RecoveryKeyCreationController implements FxController {
 				vaultListManager.add(vault.getPath());
 			}
 			window.close();
-			dialogs.prepareRecoverPasswordSuccess(window) //
+			dialogs.prepareRecoverPasswordSuccess((Stage)window.getOwner()) //
 					.setTitleKey("recover.recoverVaultConfig.title") //
 					.setMessageKey("recoveryKey.recover.resetVaultConfigSuccess.message") //
 					.setDescriptionKey("recoveryKey.recover.resetMasterkeyFileSuccess.description")

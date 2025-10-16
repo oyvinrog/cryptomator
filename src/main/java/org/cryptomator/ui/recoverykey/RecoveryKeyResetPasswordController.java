@@ -140,7 +140,7 @@ public class RecoveryKeyResetPasswordController implements FxController {
 				vaultListManager.add(vault.getPath());
 			}
 			window.close();
-			dialogs.prepareRecoverPasswordSuccess(window) //
+			dialogs.prepareRecoverPasswordSuccess((Stage)window.getOwner()) //
 					.setTitleKey("recover.recoverVaultConfig.title") //
 					.setMessageKey("recoveryKey.recover.resetVaultConfigSuccess.message") //
 					.build().showAndWait();
@@ -163,8 +163,8 @@ public class RecoveryKeyResetPasswordController implements FxController {
 			LOG.debug("Used recovery key to reset password for {}.", vault.getDisplayablePath());
 			window.close();
 			switch (recoverType.get()){
-				case RESET_PASSWORD -> dialogs.prepareRecoverPasswordSuccess(window).build().showAndWait();
-				case RESTORE_MASTERKEY -> dialogs.prepareRecoverPasswordSuccess(window).setTitleKey("recover.recoverMasterkey.title").setMessageKey("recoveryKey.recover.resetMasterkeyFileSuccess.message").build().showAndWait();
+				case RESET_PASSWORD -> dialogs.prepareRecoverPasswordSuccess((Stage)window.getOwner()).build().showAndWait();
+				case RESTORE_MASTERKEY -> dialogs.prepareRecoverPasswordSuccess((Stage)window.getOwner()).setTitleKey("recover.recoverMasterkey.title").setMessageKey("recoveryKey.recover.resetMasterkeyFileSuccess.message").build().showAndWait();
 				default -> dialogs.prepareRecoverPasswordSuccess(window).build().showAndWait(); // Fallback
 			}
 		});
