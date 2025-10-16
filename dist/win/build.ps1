@@ -208,8 +208,6 @@ Copy-Item "contrib\*" -Destination "$AppName"
 attrib -r "$AppName\$AppName.exe"
 attrib -r "$AppName\${AppName} (Debug).exe"
 
-return 0;
-
 # create .msi
 $Env:JP_WIXWIZARD_RESOURCES = "$buildDir\resources"
 $Env:JP_WIXHELPER_DIR = "."
