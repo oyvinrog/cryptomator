@@ -166,7 +166,7 @@ public class RecoveryKeyCreationController implements FxController {
 		} catch (InvalidPassphraseException e) {
 			LOG.info("Password invalid", e);
 			Animations.createShakeWindowAnimation(window).play();
-		} catch (IOException | CryptoException e) {
+		} catch (IOException | CryptoException | IllegalStateException e) {
 			LOG.error("Recovery process failed", e);
 			appWindows.showErrorWindow(e, window, null);
 		}
