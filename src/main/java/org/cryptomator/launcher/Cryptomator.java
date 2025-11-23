@@ -74,7 +74,7 @@ public class Cryptomator {
 			var buildNumber = System.getProperty("cryptomator.buildNumber", "SNAPSHOT");
 
 			//Reduce noise for parsers by using System.out directly
-			System.out.printf("Cryptomator version %s (build %s)%n", appVer, buildNumber);
+			System.out.printf("vaultXP (Experimental version of cryptomator) %s (build %s)%n", appVer, buildNumber);
 			return;
 		}
 		int exitCode = CRYPTOMATOR_COMPONENT.application().run(args);
@@ -91,7 +91,7 @@ public class Cryptomator {
 	private int run(String[] args) {
 		env.log();
 		LOG.debug("Dagger graph initialized after {}ms", System.currentTimeMillis() - STARTUP_TIME);
-		LOG.info("Starting Cryptomator {} on {} {} ({})", env.getAppVersion(), SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH);
+		LOG.info("Starting vaultXP {} on {} {} ({})", env.getAppVersion(), SystemUtils.OS_NAME, SystemUtils.OS_VERSION, SystemUtils.OS_ARCH);
 		debugMode.initialize();
 		supportedLanguages.applyPreferred();
 		changeDefaultSSLContext();

@@ -1,48 +1,16 @@
-[![cryptomator](cryptomator.png)](https://cryptomator.org/)
+[![vaultXP](cryptomator.png)](https://github.com/user/vaultXP)
 
-[![Build](https://github.com/cryptomator/cryptomator/workflows/Build/badge.svg)](https://github.com/cryptomator/cryptomator/actions/workflows/build.yml?query=branch%3Adevelop)
-[![Known Vulnerabilities](https://snyk.io/test/github/cryptomator/cryptomator/badge.svg)](https://snyk.io/test/github/cryptomator/cryptomator)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cryptomator_cryptomator&metric=alert_status)](https://sonarcloud.io/dashboard?id=cryptomator_cryptomator)
-[![Mastodon](https://img.shields.io/mastodon/follow/176112?domain=mastodon.online&style=flat)](https://mastodon.online/@cryptomator)
-[![Crowdin](https://badges.crowdin.net/cryptomator/localized.svg)](https://translate.cryptomator.org/)
-[![Latest Release](https://img.shields.io/github/release/cryptomator/cryptomator.svg)](https://github.com/cryptomator/cryptomator/releases/latest)
-[![Community](https://img.shields.io/badge/help-Community-orange.svg)](https://community.cryptomator.org)
+# vaultXP - Experimental version of cryptomator
 
-## Supporting Cryptomator
-
-Cryptomator is provided free of charge as an open-source project despite the high development effort and is therefore dependent on donations. If you are also interested in further development, we offer you the opportunity to support us:
-
-- [One-time or recurring donation via Cryptomator's website.](https://cryptomator.org/#donate)
-- [Become a sponsor via Cryptomator's sponsors website.](https://cryptomator.org/sponsors/)
-
-### Gold Sponsors
-
-Become our Gold Sponsor and showcase your brand to a targeted audience! Please contact us if you are interested.
-
-### Silver Sponsors
-
-<table>
-  <tbody>
-    <tr>
-      <td><a href="https://www.gee-whiz.de/"><img src="https://cryptomator.org/img/sponsors/geewhiz.svg" alt="gee-whiz" height="56"></a></td>
-      <td><a href="https://www.route4me.com/"><img src="https://cryptomator.org/img/sponsors/route4me.svg" alt="Route4Me" height="56"></a></td>
-    </tr>
-  </tbody>
-</table>
-
-### Special Shoutout
-
-Continuous integration hosting for ARM64 builds is provided by [MacStadium](https://www.macstadium.com/company/opensource).
-
-<a href="https://www.macstadium.com/company/opensource"><img src="https://uploads-ssl.webflow.com/5ac3c046c82724970fc60918/5c019d917bba312af7553b49_MacStadium-developerlogo.png" alt="MacStadium" height="100"></a>
+vaultXP is an experimental fork of Cryptomator, exploring new features and capabilities for cloud storage encryption.
 
 ---
 
 ## Introduction
 
-Cryptomator offers multi-platform transparent client-side encryption of your files in the cloud.
+vaultXP offers multi-platform transparent client-side encryption of your files in the cloud. This is an experimental version of Cryptomator with additional features and modifications.
 
-Download native binaries of Cryptomator on [cryptomator.org](https://cryptomator.org/) or clone and build Cryptomator using Maven (instructions below).
+Build vaultXP using Maven (instructions below).
 
 ## Features
 
@@ -72,7 +40,7 @@ Download native binaries of Cryptomator on [cryptomator.org](https://cryptomator
 
 ### Security Architecture
 
-For more information on the security details visit [cryptomator.org](https://docs.cryptomator.org/security/architecture/).
+For more information on the security details of the underlying Cryptomator architecture visit [cryptomator.org](https://docs.cryptomator.org/security/architecture/).
 
 ## Building
 

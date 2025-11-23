@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Run Cryptomator with multi-identity feature
+# Run vaultXP - Experimental version of cryptomator
 cd "$(dirname "$0")"
 
-echo "Starting Cryptomator with multi-identity support..."
+echo "Starting vaultXP..."
 echo "==========================================="
 echo ""
 
 # Create directories if they don't exist
-mkdir -p ~/.config/Cryptomator-Dev
-mkdir -p ~/.local/share/Cryptomator-Dev/logs
-mkdir -p ~/.local/share/Cryptomator-Dev/plugins
-mkdir -p ~/.local/share/Cryptomator-Dev/mnt
+mkdir -p ~/.config/vaultXP-Dev
+mkdir -p ~/.local/share/vaultXP-Dev/logs
+mkdir -p ~/.local/share/vaultXP-Dev/plugins
+mkdir -p ~/.local/share/vaultXP-Dev/mnt
 
 # Build with Maven (compiles and copies dependencies to mods/ and libs/)
 echo "Building application..."
@@ -68,12 +68,12 @@ java \
   --module-path "$MODULEPATH" \
   --class-path "$CLASSPATH" \
   --add-modules ALL-MODULE-PATH \
-  -Dcryptomator.ipcSocketPath="$HOME/.config/Cryptomator-Dev/ipc.socket" \
-  -Dcryptomator.settingsPath="$HOME/.config/Cryptomator-Dev/settings.json" \
-  -Dcryptomator.p12Path="$HOME/.config/Cryptomator-Dev/key.p12" \
-  -Dcryptomator.logDir="$HOME/.local/share/Cryptomator-Dev/logs" \
-  -Dcryptomator.pluginDir="$HOME/.local/share/Cryptomator-Dev/plugins" \
-  -Dcryptomator.mountPointsDir="$HOME/.local/share/Cryptomator-Dev/mnt" \
+  -Dcryptomator.ipcSocketPath="$HOME/.config/vaultXP-Dev/ipc.socket" \
+  -Dcryptomator.settingsPath="$HOME/.config/vaultXP-Dev/settings.json" \
+  -Dcryptomator.p12Path="$HOME/.config/vaultXP-Dev/key.p12" \
+  -Dcryptomator.logDir="$HOME/.local/share/vaultXP-Dev/logs" \
+  -Dcryptomator.pluginDir="$HOME/.local/share/vaultXP-Dev/plugins" \
+  -Dcryptomator.mountPointsDir="$HOME/.local/share/vaultXP-Dev/mnt" \
   -Dcryptomator.showTrayIcon=true \
   -Xss20m \
   -Xmx512m \

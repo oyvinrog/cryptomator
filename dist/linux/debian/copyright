@@ -1,10 +1,11 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: cryptomator
-Upstream-Contact: Cryptomator <info@cryptomator.org>
-Source: https://cryptomator.org
+Upstream-Name: vaultxp
+Upstream-Contact: vaultXP <dev@vaultxp.local>
+Source: https://github.com/user/vaultXP
 
 Files: *
-Copyright: 2016-2025 Skymatic GmbH
+Copyright: 2016-2025 Skymatic GmbH (original Cryptomator)
+           2025 vaultXP Contributors (experimental fork)
 License: GPL-3+
 
 Files: debian/org.cryptomator.Cryptomator.appdata.xml

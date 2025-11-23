@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Cryptomator
-Comment=Cloud Storage Encryption Utility
-Exec=cryptomator %F
-Icon=org.cryptomator.Cryptomator
+Name=vaultXP
+Comment=Experimental version of cryptomator - Cloud Storage Encryption Utility
+Exec=vaultxp %F
+Icon=org.vaultxp.VaultXP
 Terminal=false
 Type=Application
 Categories=Utility;Security;FileTools;

@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for Cryptomator
+# postinst script for vaultXP
 #
 # see: dh_installdeb(1)
 
