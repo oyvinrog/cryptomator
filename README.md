@@ -29,6 +29,17 @@ Experimental features:
 - Deniable encryption
 - Key derivation iteration count slider. Choose your own security level.
 
+### Deniable Encryption
+
+Deniable encryption can be used to fool an adversary into thinking that you are using another vault (but you really have two vaults. One is visible, the other is hidden).
+
+### Iteration Count Slider
+
+The iteration count slider allows you to choose your own security level. 
+When adjusting the slider, the estimated unlock time and brute-force resistance will be updated.
+
+[![slider](img/iteration_count.png)](img/iteration_slider.png)
+
 ### Privacy
 
 - 256-bit keys (unlimited strength policy bundled with native binaries)
