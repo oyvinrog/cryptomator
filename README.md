@@ -1,4 +1,4 @@
-[![vaultXP](cryptomator.png)](https://github.com/user/vaultXP)
+[![vaultXP](vaultxp.png)](https://github.com/user/vaultXP)
 
 # vaultXP - Experimental version of cryptomator
 

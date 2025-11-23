@@ -23,7 +23,7 @@ override_dh_auto_clean:
 
 override_dh_auto_build:
 	mkdir resources
-	ln -s ../common/org.cryptomator.Cryptomator512.png resources/cryptomator.png
+	ln -s ../common/org.cryptomator.Cryptomator512.png resources/vaultxp.png
 # Remark: no compression is applied for improved build compression later (here deb)
 	$(JAVA_HOME)/bin/jlink \
 		--output runtime \
