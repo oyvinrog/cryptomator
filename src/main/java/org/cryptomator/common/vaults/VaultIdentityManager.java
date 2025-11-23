@@ -81,7 +81,9 @@ public class VaultIdentityManager {
 	 * SECURITY: Identities are discovered during unlock, not pre-enumerated.
 	 */
 	public Optional<VaultIdentity> getPrimaryIdentity() {
-		return Optional.empty();
+		// Return a default primary identity for standard vault unlock
+		// In plausible deniability model, actual identity is discovered during unlock
+		return Optional.of(VaultIdentity.createPrimary("Primary", "Default vault identity"));
 	}
 
 	/**

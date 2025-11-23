@@ -1,0 +1,50 @@
+/* Custom styling for iteration count slider to ensure thumb is visible */
+
+#iterationSlider {
+    -fx-padding: 10px 0;
+}
+
+/* Make the slider thumb VERY visible and large */
+#iterationSlider .thumb {
+    -fx-background-color: #2196F3; /* Bright blue */
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-cursor: hand;
+}
+
+#iterationSlider .thumb:hover {
+    -fx-background-color: #1976D2; /* Darker blue on hover */
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+}
+
+#iterationSlider .thumb:pressed {
+    -fx-background-color: #0D47A1; /* Even darker when pressed */
+}
+
+/* Style the track */
+#iterationSlider .track {
+    -fx-background-color: #E0E0E0;
+    -fx-background-radius: 3px;
+    -fx-pref-height: 6px;
+}
+
+/* Style the filled portion of the track */
+#iterationSlider .track .fill {
+    -fx-background-color: #64B5F6; /* Light blue */
+    -fx-background-radius: 3px;
+}
+
+/* Make tick marks visible */
+#iterationSlider .axis {
+    -fx-tick-label-fill: #666666;
+}
+
+#iterationSlider .axis .axis-tick-mark {
+    -fx-stroke: #999999;
+}
+
+#iterationSlider .axis .axis-minor-tick-mark {
+    -fx-stroke: #CCCCCC;
+}
+

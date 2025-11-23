@@ -25,17 +25,22 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
+import org.cryptomator.common.keychain.KeyDerivationCalculator;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.channels.WritableByteChannel;
@@ -77,12 +82,19 @@ public class CreateNewVaultPasswordController implements FxController {
 	private final BooleanProperty readyToCreateVault;
 	private final ObjectBinding<ContentDisplay> createVaultButtonState;
 	private final IntegerProperty shorteningThreshold;
+	private final IntegerProperty pbkdf2Iterations;
+	private final StringBinding unlockTimeEstimate;
+	private final StringBinding crackTimeEstimate;
 
 	/* FXML */
 	public ToggleGroup recoveryKeyChoice;
 	public Toggle showRecoveryKey;
 	public Toggle skipRecoveryKey;
 	public NewPasswordController newPasswordSceneController;
+	public Slider iterationSlider;
+	public Label unlockTimeLabel;
+	public Label crackTimeLabel;
+	public Label securityLevelLabel;
 
 	@Inject
 	CreateNewVaultPasswordController(@AddVaultWizardWindow Stage window, //
@@ -124,6 +136,21 @@ public class CreateNewVaultPasswordController implements FxController {
 		this.readyToCreateVault = new SimpleBooleanProperty();
 		this.createVaultButtonState = Bindings.when(processing).then(ContentDisplay.LEFT).otherwise(ContentDisplay.TEXT_ONLY);
 		this.shorteningThreshold = shorteningThreshold;
+		this.pbkdf2Iterations = new SimpleIntegerProperty(MultiKeyslotFile.DEFAULT_PBKDF2_ITERATIONS);
+		
+		// Create bindings for time estimates
+		this.unlockTimeEstimate = Bindings.createStringBinding(() -> {
+			long timeMs = KeyDerivationCalculator.estimateDerivationTime(pbkdf2Iterations.get());
+			if (timeMs < 1000) {
+				return String.format("~%d ms", timeMs);
+			} else {
+				return String.format("~%.1f seconds", timeMs / 1000.0);
+			}
+		}, pbkdf2Iterations);
+		
+		this.crackTimeEstimate = Bindings.createStringBinding(() -> {
+			return KeyDerivationCalculator.estimateSimplePasswordCrackTime(pbkdf2Iterations.get());
+		}, pbkdf2Iterations);
 	}
 
 	@FXML
@@ -142,6 +169,40 @@ public class CreateNewVaultPasswordController implements FxController {
 		LOG.info("Binding readyToCreateVault property");
 		readyToCreateVault.bind(newPasswordSceneController.goodPasswordProperty().and(recoveryKeyChoice.selectedToggleProperty().isNotNull()).and(processing.not()));
 		
+		// Initialize iteration slider
+		if (iterationSlider != null) {
+			LOG.info("Initializing iteration slider");
+			
+			// Don't override FXML values - just ensure it's enabled
+			iterationSlider.setDisable(false);
+			
+			// Add listener for value changes (converts double -> int)
+			iterationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+				int iterations = newValue.intValue();
+				LOG.info("Slider value changed: {} -> {} iterations", oldValue.intValue(), iterations);
+				pbkdf2Iterations.set(iterations);
+			});
+			
+			// Initialize the property with the slider's current FXML value
+			pbkdf2Iterations.set((int) iterationSlider.getValue());
+			LOG.info("Slider initialized: min={}, max={}, value={}", 
+				(int)iterationSlider.getMin(), (int)iterationSlider.getMax(), (int)iterationSlider.getValue());
+		} else {
+			LOG.error("iterationSlider is NULL! Check FXML fx:id attribute.");
+		}
+		
+		// Bind UI labels to estimates
+		if (unlockTimeLabel != null) {
+			unlockTimeLabel.textProperty().bind(unlockTimeEstimate);
+		}
+		if (crackTimeLabel != null) {
+			crackTimeLabel.textProperty().bind(crackTimeEstimate);
+		}
+		if (securityLevelLabel != null) {
+			securityLevelLabel.textProperty().bind(Bindings.createStringBinding(() -> 
+				KeyDerivationCalculator.getSecurityLevel(pbkdf2Iterations.get()), pbkdf2Iterations));
+		}
+		
 		// Debug bindings
 		newPasswordSceneController.goodPasswordProperty().addListener((obs, oldVal, newVal) -> {
 			LOG.info("Good password changed: {}", newVal);
@@ -154,6 +215,9 @@ public class CreateNewVaultPasswordController implements FxController {
 		});
 		readyToCreateVault.addListener((obs, oldVal, newVal) -> {
 			LOG.info("Ready to create vault: {}", newVal);
+		});
+		pbkdf2Iterations.addListener((obs, oldVal, newVal) -> {
+			LOG.debug("PBKDF2 iterations changed to: {}", newVal);
 		});
 		
 		window.setOnHiding(event -> {
@@ -249,7 +313,8 @@ public class CreateNewVaultPasswordController implements FxController {
 			"Default vault identity", 
 			masterkey, 
 			newPasswordSceneController.passwordField.getCharacters(),
-			multiKeyslotFile
+			multiKeyslotFile,
+			pbkdf2Iterations.get()
 		);
 
 			// 2. initialize vault:

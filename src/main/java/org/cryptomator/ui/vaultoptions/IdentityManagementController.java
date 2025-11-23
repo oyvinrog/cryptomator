@@ -153,7 +153,8 @@ public class IdentityManagementController implements FxController {
 		try {
 			// Add identity - will use the same masterkey encrypted with different password
 			VaultIdentity identity = IdentityInitializer.addSecondaryIdentity(
-				vault.getPath(), name, description, primaryPassword, newPassword, multiKeyslotFile, multiKeyslotVaultConfig
+				vault.getPath(), name, description, primaryPassword, newPassword, multiKeyslotFile, multiKeyslotVaultConfig,
+				org.cryptomator.common.keychain.MultiKeyslotFile.DEFAULT_PBKDF2_ITERATIONS
 			);
 
 			// Reload identities

@@ -31,14 +31,23 @@ public final class IdentityInitializer {
 	 * Initialize a new vault with a primary identity.
 	 * Creates a multi-keyslot masterkey file with single keyslot.
 	 * TrueCrypt-style: All vaults use multi-keyslot format from the start.
+	 * 
+	 * @param vaultPath Path to vault
+	 * @param identityName Identity name (for logging/debugging)
+	 * @param identityDescription Identity description
+	 * @param masterkey The masterkey to encrypt
+	 * @param password Password to protect the masterkey
+	 * @param multiKeyslotFile Multi-keyslot file handler
+	 * @param pbkdf2Iterations PBKDF2 iteration count for key derivation
 	 */
 	public static void initializePrimaryIdentity(Path vaultPath, String identityName, 
 												  String identityDescription, Masterkey masterkey, 
 												  CharSequence password, 
-												  MultiKeyslotFile multiKeyslotFile) throws IOException {
+												  MultiKeyslotFile multiKeyslotFile,
+												  int pbkdf2Iterations) throws IOException {
 		// Create multi-keyslot file with primary keyslot
 		Path masterkeyPath = vaultPath.resolve("masterkey.cryptomator");
-		multiKeyslotFile.persist(masterkeyPath, masterkey, password, 9);
+		multiKeyslotFile.persist(masterkeyPath, masterkey, password, 9, pbkdf2Iterations);
 		
 		// SECURITY: Don't mention "multi-keyslot" format
 		LOG.info("Initialized primary vault at {}", vaultPath);
@@ -56,6 +65,7 @@ public final class IdentityInitializer {
 	 * @param hiddenPassword Password for hidden keyslot
 	 * @param multiKeyslotFile Multi-keyslot file handler
 	 * @param multiKeyslotVaultConfig Multi-keyslot vault config handler
+	 * @param pbkdf2Iterations PBKDF2 iteration count for key derivation
 	 * @return VaultIdentity for hidden vault
 	 * @throws IOException on errors
 	 */
@@ -63,7 +73,8 @@ public final class IdentityInitializer {
 													 String identityDescription, CharSequence primaryPassword,
 													 CharSequence hiddenPassword, 
 													 MultiKeyslotFile multiKeyslotFile,
-													 MultiKeyslotVaultConfig multiKeyslotVaultConfig) throws IOException {
+													 MultiKeyslotVaultConfig multiKeyslotVaultConfig,
+													 int pbkdf2Iterations) throws IOException {
 		Path masterkeyPath = vaultPath.resolve("masterkey.cryptomator");
 		Path vaultConfigPath = vaultPath.resolve("vault.cryptomator");
 		
@@ -90,7 +101,7 @@ public final class IdentityInitializer {
 			
 			// Step 1: Add keyslot to existing masterkey.cryptomator file
 			// Pass primaryPassword for legacy conversion (if needed)
-			multiKeyslotFile.addKeyslot(masterkeyPath, hiddenMasterkey, hiddenPassword, primaryPassword, 9);
+			multiKeyslotFile.addKeyslot(masterkeyPath, hiddenMasterkey, hiddenPassword, primaryPassword, 9, pbkdf2Iterations);
 			
 		// Step 2: Create hidden vault config in temporary location
 		Path tempVaultDir = Files.createTempDirectory("vlt-");

@@ -108,7 +108,8 @@ public class HiddenVaultCreationDialog {
 				primaryPassword,
 				hiddenPassword,
 				multiKeyslotFile,
-				multiKeyslotVaultConfig
+				multiKeyslotVaultConfig,
+				org.cryptomator.common.keychain.MultiKeyslotFile.DEFAULT_PBKDF2_ITERATIONS
 			);
 
 			// Reload vault identities

@@ -24,6 +24,11 @@ Build vaultXP using Maven (instructions below).
 - Use as many vaults in your Dropbox as you want, each having individual passwords
 - More than Five thousand commits for the security of your data!! :tada:
 
+Experimental features:
+
+- Deniable encryption
+- Key derivation iteration count slider. Choose your own security level.
+
 ### Privacy
 
 - 256-bit keys (unlimited strength policy bundled with native binaries)

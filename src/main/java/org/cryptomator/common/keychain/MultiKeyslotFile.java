@@ -78,14 +78,18 @@ public class MultiKeyslotFile {
 	// AEAD encryption parameters (AES-256-GCM)
 	private static final int SALT_LENGTH = 32;  // 256 bits for PBKDF2
 	private static final int IV_LENGTH = 12;    // 96 bits for GCM (recommended)
+	private static final int ITERATIONS_LENGTH = 4;  // 32 bits for iteration count (stored unencrypted)
 	private static final int GCM_TAG_LENGTH = 128;  // 128-bit authentication tag
-	private static final int PBKDF2_ITERATIONS = 100000;  // Strong key derivation
+	public static final int DEFAULT_PBKDF2_ITERATIONS = 100000;  // Default strong key derivation
+	public static final int MIN_PBKDF2_ITERATIONS = 50000;  // Minimum allowed iterations
+	public static final int MAX_PBKDF2_ITERATIONS = 10000000;  // Maximum allowed iterations (10 million)
 	private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA256";
 	private static final String AES_GCM_ALGORITHM = "AES/GCM/NoPadding";
 	private static final int AES_KEY_SIZE = 256;  // AES-256
 	
-	// Overhead: salt(32) + iv(12) + tag(16) = 60 bytes
-	private static final int AEAD_OVERHEAD = SALT_LENGTH + IV_LENGTH + (GCM_TAG_LENGTH / 8);
+	// Overhead: salt(32) + iv(12) + iterations(4) + tag(16) = 64 bytes
+	// Slot format: [salt:32][iv:12][iterations:4][AEAD(length:4 + keyslot_data + padding)]
+	private static final int AEAD_OVERHEAD = SALT_LENGTH + IV_LENGTH + ITERATIONS_LENGTH + (GCM_TAG_LENGTH / 8);
 	private static final int MAX_KEYSLOT_SIZE = SLOT_SIZE - AEAD_OVERHEAD;
 	
 	private final MasterkeyFileAccess masterkeyFileAccess;
@@ -165,9 +169,10 @@ public class MultiKeyslotFile {
 	 * @param masterkey Masterkey to encrypt
 	 * @param password Password to encrypt with
 	 * @param scryptCostParam scrypt cost parameter
+	 * @param pbkdf2Iterations PBKDF2 iteration count for key derivation
 	 * @throws IOException on I/O errors
 	 */
-	public void persist(Path path, Masterkey masterkey, CharSequence password, int scryptCostParam) throws IOException {
+	public void persist(Path path, Masterkey masterkey, CharSequence password, int scryptCostParam, int pbkdf2Iterations) throws IOException {
 		// Create temp file with encrypted masterkey
 		Path tempKeyslot = Files.createTempFile("vlt-", ".tmp");
 		try {
@@ -179,7 +184,7 @@ public class MultiKeyslotFile {
 			
 			// Slot 0: Real AEAD-encrypted keyslot
 			try {
-				byte[] slot0 = aeadEncryptSlot(keyslotData, password);
+				byte[] slot0 = aeadEncryptSlot(keyslotData, password, pbkdf2Iterations);
 				System.arraycopy(slot0, 0, fileData, 0, SLOT_SIZE);
 			} catch (GeneralSecurityException e) {
 				throw new IOException("Failed to encrypt keyslot", e);
@@ -220,9 +225,10 @@ public class MultiKeyslotFile {
 	 * @param password Password for hidden keyslot
 	 * @param primaryPassword Password for primary keyslot (used for legacy conversion)
 	 * @param scryptCostParam scrypt cost parameter
+	 * @param pbkdf2Iterations PBKDF2 iteration count for key derivation
 	 * @throws IOException on I/O errors or if all slots are full
 	 */
-	public void addKeyslot(Path path, Masterkey masterkey, CharSequence password, CharSequence primaryPassword, int scryptCostParam) throws IOException {
+	public void addKeyslot(Path path, Masterkey masterkey, CharSequence password, CharSequence primaryPassword, int scryptCostParam, int pbkdf2Iterations) throws IOException {
 		byte[] fileData;
 		boolean wasLegacyConversion = false;
 		
@@ -238,7 +244,7 @@ public class MultiKeyslotFile {
 			
 			// Slot 0: Legacy keyslot (AEAD-encrypted with PRIMARY password)
 			try {
-				byte[] slot0 = aeadEncryptSlot(legacyData, primaryPassword);  // ← FIX: use primaryPassword!
+				byte[] slot0 = aeadEncryptSlot(legacyData, primaryPassword, DEFAULT_PBKDF2_ITERATIONS);  // ← FIX: use primaryPassword!
 				System.arraycopy(slot0, 0, fileData, 0, SLOT_SIZE);
 			} catch (GeneralSecurityException e) {
 				throw new IOException("Failed to encrypt legacy keyslot", e);
@@ -313,7 +319,7 @@ public class MultiKeyslotFile {
 			// AEAD-encrypt the keyslot with the provided password
 			byte[] aeadEncryptedSlot;
 			try {
-				aeadEncryptedSlot = aeadEncryptSlot(newKeyslotData, password);
+				aeadEncryptedSlot = aeadEncryptSlot(newKeyslotData, password, pbkdf2Iterations);
 			} catch (GeneralSecurityException e) {
 				throw new IOException("Failed to encrypt keyslot", e);
 			}
@@ -447,14 +453,19 @@ public class MultiKeyslotFile {
 	/**
 	 * AEAD-encrypt keyslot data to fixed slot size using AES-256-GCM.
 	 * 
-	 * Format: [salt:32][iv:12][AEAD(padded_plaintext)]
+	 * Format: [salt:32][iv:12][iterations:4][AEAD(padded_plaintext)]
+	 * Plaintext format: [length:4][keyslot_data][random_padding]
 	 * 
 	 * Security: AEAD provides both encryption and authentication.
+	 * Iteration count is stored OUTSIDE encrypted data so it can be read before decryption.
 	 * Plaintext is padded to fixed size BEFORE encryption so entire slot is authenticated.
 	 * 
+	 * @param keyslotData The keyslot data to encrypt
+	 * @param password The password to derive the encryption key from
+	 * @param pbkdf2Iterations The PBKDF2 iteration count
 	 * @throws IllegalArgumentException if keyslot data too large
 	 */
-	private byte[] aeadEncryptSlot(byte[] keyslotData, CharSequence password) throws GeneralSecurityException {
+	private byte[] aeadEncryptSlot(byte[] keyslotData, CharSequence password, int pbkdf2Iterations) throws GeneralSecurityException {
 		// Reserve 4 bytes for length header in plaintext before encryption
 		if (keyslotData.length > MAX_KEYSLOT_SIZE - 4) {
 			throw new IllegalArgumentException("Keyslot data too large: " + keyslotData.length + 
@@ -465,8 +476,8 @@ public class MultiKeyslotFile {
 		byte[] salt = new byte[SALT_LENGTH];
 		secureRandom.nextBytes(salt);
 		
-		// Derive encryption key from password using PBKDF2
-		SecretKey encryptionKey = deriveKey(password, salt);
+		// Derive encryption key from password using PBKDF2 with configurable iterations
+		SecretKey encryptionKey = deriveKey(password, salt, pbkdf2Iterations);
 		
 		// Generate random IV for GCM
 		byte[] iv = new byte[IV_LENGTH];
@@ -474,11 +485,11 @@ public class MultiKeyslotFile {
 		
 		// Pad plaintext to fixed size BEFORE encryption
 		// This ensures entire slot is AEAD-authenticated (no unauthenticated padding)
-		int plaintextSize = SLOT_SIZE - SALT_LENGTH - IV_LENGTH - (GCM_TAG_LENGTH / 8);
+		int plaintextSize = SLOT_SIZE - SALT_LENGTH - IV_LENGTH - ITERATIONS_LENGTH - (GCM_TAG_LENGTH / 8);
 		byte[] paddedPlaintext = new byte[plaintextSize];
 		
 		// Store length at the start (little-endian, 4 bytes)
-		// This is OK because it will be ENCRYPTED by AEAD
+		// This will be ENCRYPTED by AEAD
 		paddedPlaintext[0] = (byte) (keyslotData.length & 0xFF);
 		paddedPlaintext[1] = (byte) ((keyslotData.length >> 8) & 0xFF);
 		paddedPlaintext[2] = (byte) ((keyslotData.length >> 16) & 0xFF);
@@ -504,12 +515,14 @@ public class MultiKeyslotFile {
 		// Now the entire slot content is authenticated!
 		byte[] ciphertextWithTag = cipher.doFinal(paddedPlaintext);
 		
-		// Build slot: [salt][iv][ciphertext+tag]
-		// NO unauthenticated padding!
+		// Build slot: [salt][iv][iterations][ciphertext+tag]
+		// Iterations are OUTSIDE the encryption so they can be read before decryption
 		byte[] slot = new byte[SLOT_SIZE];
 		ByteBuffer buffer = ByteBuffer.wrap(slot);
 		buffer.put(salt);
 		buffer.put(iv);
+		// Store iteration count (little-endian, 4 bytes) UNENCRYPTED
+		buffer.putInt(Integer.reverseBytes(pbkdf2Iterations)); // little-endian
 		buffer.put(ciphertextWithTag);
 		
 		// Verify size invariant (should always be true by construction)
@@ -523,6 +536,7 @@ public class MultiKeyslotFile {
 	
 	/**
 	 * AEAD-decrypt a slot using AES-256-GCM.
+	 * Handles both new format (with explicit iteration count) and old format (default iterations).
 	 * 
 	 * @throws GeneralSecurityException if AEAD authentication fails
 	 *         This means EITHER wrong password OR slot contains random data (empty slot)
@@ -543,13 +557,35 @@ public class MultiKeyslotFile {
 		byte[] iv = new byte[IV_LENGTH];
 		buffer.get(iv);
 		
-		// Remaining is ciphertext + tag
-		int ciphertextLength = SLOT_SIZE - SALT_LENGTH - IV_LENGTH;
-		byte[] ciphertextWithTag = new byte[ciphertextLength];
-		buffer.get(ciphertextWithTag);
+		// Try to extract iteration count (stored unencrypted, little-endian)
+		int storedIterations = Integer.reverseBytes(buffer.getInt());
 		
-		// Derive decryption key from password
-		SecretKey decryptionKey = deriveKey(password, salt);
+		// Check if this looks like a valid iteration count (new format)
+		// If not, this is probably old format or random data
+		boolean isNewFormat = (storedIterations >= MIN_PBKDF2_ITERATIONS && storedIterations <= MAX_PBKDF2_ITERATIONS);
+		
+		int ciphertextLength;
+		byte[] ciphertextWithTag;
+		int iterationsToUse;
+		
+		if (isNewFormat) {
+			// NEW FORMAT: iteration count is explicit
+			ciphertextLength = SLOT_SIZE - SALT_LENGTH - IV_LENGTH - ITERATIONS_LENGTH;
+			ciphertextWithTag = new byte[ciphertextLength];
+			buffer.get(ciphertextWithTag);
+			iterationsToUse = storedIterations;
+		} else {
+			// OLD FORMAT or RANDOM DATA: reset buffer and use default iterations
+			// The 4 bytes we read as "iterations" were actually part of the ciphertext
+			buffer.position(SALT_LENGTH + IV_LENGTH); // Reset to after IV
+			ciphertextLength = SLOT_SIZE - SALT_LENGTH - IV_LENGTH;
+			ciphertextWithTag = new byte[ciphertextLength];
+			buffer.get(ciphertextWithTag);
+			iterationsToUse = DEFAULT_PBKDF2_ITERATIONS;
+		}
+		
+		// Derive decryption key using the determined iteration count
+		SecretKey decryptionKey = deriveKey(password, salt, iterationsToUse);
 		
 		// Decrypt with AES-GCM (AEAD)
 		// NO LOGGING: revealing decryption details could leak slot information
@@ -582,8 +618,13 @@ public class MultiKeyslotFile {
 	
 	/**
 	 * Derive AES-256 key from password using PBKDF2-HMAC-SHA256.
+	 * 
+	 * @param password The password to derive from
+	 * @param salt The salt for key derivation
+	 * @param iterations The number of PBKDF2 iterations
+	 * @return The derived AES-256 key
 	 */
-	private SecretKey deriveKey(CharSequence password, byte[] salt) throws GeneralSecurityException {
+	private SecretKey deriveKey(CharSequence password, byte[] salt, int iterations) throws GeneralSecurityException {
 		char[] passwordChars = null;
 		byte[] keyBytes = null;
 		try {
@@ -592,7 +633,7 @@ public class MultiKeyslotFile {
 				passwordChars[i] = password.charAt(i);
 			}
 			
-			PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, PBKDF2_ITERATIONS, AES_KEY_SIZE);
+			PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, iterations, AES_KEY_SIZE);
 			try {
 				SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
 				keyBytes = factory.generateSecret(spec).getEncoded();
